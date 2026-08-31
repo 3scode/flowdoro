@@ -88,7 +88,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Semua screen
 **Related FR:** N/A
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** Svelte 5, Tailwind CSS 4
 **File yang diubah:** `apps/web/src/app.css`, `apps/web/tailwind.config.ts`, `apps/web/src/lib/components/ui/*`
