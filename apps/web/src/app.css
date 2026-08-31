@@ -27,16 +27,6 @@
   --color-warning: #f59e0b;
   --color-border: #e2e8f0;
 
-  /* Spacing (4px grid) */
-  --spacing-2xs: 2px;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
-
   /* Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -110,6 +100,32 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--radius-md);
+}
+
+/* Global text wrapping — prevent word-per-line (perkatas enter) for semua text */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+a,
+label,
+button {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 /* Focus ring for accessibility */

@@ -10,6 +10,7 @@
   import Analytics from '$lib/pages/Analytics.svelte'
   import Settings from '$lib/pages/Settings.svelte'
   import Navigation from '$lib/components/layout/Navigation.svelte'
+  import Agentation from '$lib/components/Agentation.svelte'
 
   let path = $state(window.location.pathname)
   let user: any = $state(null)
@@ -69,4 +70,8 @@
       </main>
     </div>
   </div>
+{/if}
+
+{#if import.meta.env.DEV}
+  <Agentation />
 {/if}

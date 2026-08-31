@@ -7,6 +7,11 @@
     "iconify": { "enabled": true },
     "image-downloader": { "enabled": true },
     "filesystem": { "enabled": true },
-    "agentation": { "enabled": true }
+    "agentation": { "enabled": true },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    }
   }
 }

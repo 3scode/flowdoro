@@ -21,9 +21,9 @@
   $effect(() => { period; load() })
 </script>
 
-<div class="max-w-5xl mx-auto px-4 py-6 pb-20 md:pb-6 flex flex-col gap-6">
-  <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Analytics</h1>
+<div class="w-full max-w-5xl mx-auto px-4 py-6 pb-20 md:pb-6 flex flex-col gap-6">
+  <div class="flex items-center justify-between gap-2">
+    <h1 class="w-full text-2xl font-bold text-balance break-words">Analytics</h1>
     <div class="flex rounded-md border border-border overflow-hidden">
       {#each ['day','week','month'] as p}
         <button class="px-3 py-1.5 text-sm capitalize" class:bg-primary={period===p} class:text-white={period===p} onclick={() => period = p}>{p}</button>
@@ -32,27 +32,27 @@
   </div>
   {#if loading}<div class="h-64 rounded-lg skeleton"></div>
   {:else if !summary}
-    <div class="rounded-xl border border-dashed bg-surface p-12 text-center">
-      <p class="font-semibold">Building your insights</p>
-      <p class="text-sm text-text-secondary">Complete a few more sessions.</p>
+    <div class="w-full rounded-xl border border-dashed bg-surface p-12 text-center">
+      <p class="w-full font-semibold text-balance break-words">Building your insights</p>
+      <p class="w-full text-sm leading-relaxed text-text-secondary text-balance break-words">Complete a few more sessions.</p>
     </div>
   {:else}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="rounded-lg border bg-surface p-4"><p class="text-xs text-text-secondary">Avg Focus</p><p class="text-xl font-bold">{formatDuration(summary.avgFocus)}</p></div>
-      <div class="rounded-lg border bg-surface p-4"><p class="text-xs text-text-secondary">Total Focus</p><p class="text-xl font-bold">{formatDuration(summary.totalFocus)}</p></div>
-      <div class="rounded-lg border bg-surface p-4"><p class="text-xs text-text-secondary">Best Day</p><p class="text-xl font-bold">{summary.bestDay ? formatDuration(summary.bestDay.value) : '—'}</p></div>
-      <div class="rounded-lg border bg-surface p-4"><p class="text-xs text-text-secondary">Longest</p><p class="text-xl font-bold">{formatDuration(summary.longestSession)}</p></div>
+      <div class="rounded-lg border bg-surface p-4"><p class="text-xs leading-relaxed text-text-secondary break-words">Avg Focus</p><p class="text-xl font-bold break-words">{formatDuration(summary.avgFocus)}</p></div>
+      <div class="rounded-lg border bg-surface p-4"><p class="text-xs leading-relaxed text-text-secondary break-words">Total Focus</p><p class="text-xl font-bold break-words">{formatDuration(summary.totalFocus)}</p></div>
+      <div class="rounded-lg border bg-surface p-4"><p class="text-xs leading-relaxed text-text-secondary break-words">Best Day</p><p class="text-xl font-bold break-words">{summary.bestDay ? formatDuration(summary.bestDay.value) : '—'}</p></div>
+      <div class="rounded-lg border bg-surface p-4"><p class="text-xs leading-relaxed text-text-secondary break-words">Longest</p><p class="text-xl font-bold break-words">{formatDuration(summary.longestSession)}</p></div>
     </div>
     <div class="rounded-lg border bg-surface p-4">
-      <h3 class="font-semibold mb-3">Focus Trend</h3>
-      {#if history.length === 0}<p class="text-sm text-text-secondary">No data for this period.</p>
+      <h3 class="w-full font-semibold mb-3 text-balance break-words">Focus Trend</h3>
+      {#if history.length === 0}<p class="w-full text-sm leading-relaxed text-text-secondary text-balance break-words">No data for this period.</p>
       {:else}
         <div class="flex items-end gap-1 h-32">
           {#each history as pt}
             {@const max = Math.max(...history.map((p) => p.seconds), 1)}
             <div class="flex-1 flex flex-col items-center gap-1">
               <div class="w-full rounded-t bg-primary" style="height: {(pt.seconds / max) * 100}% ; min-height: 4px"></div>
-              <span class="text-[10px] text-text-secondary">{pt.date.slice(5)}</span>
+              <span class="text-[10px] leading-relaxed text-text-secondary break-words">{pt.date.slice(5)}</span>
             </div>
           {/each}
         </div>

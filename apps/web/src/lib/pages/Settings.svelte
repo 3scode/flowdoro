@@ -24,19 +24,19 @@
   }
 </script>
 
-<div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6 flex flex-col gap-6">
-  <h1 class="text-2xl font-bold">Settings</h1>
-  <section class="rounded-xl border border-border bg-surface p-6 flex flex-col gap-4">
-    <h2 class="font-semibold">Profile</h2>
+<div class="w-full max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6 flex flex-col gap-6">
+  <h1 class="w-full text-2xl font-bold text-balance break-words">Settings</h1>
+  <section class="w-full rounded-xl border border-border bg-surface p-6 flex flex-col gap-4">
+    <h2 class="w-full font-semibold text-balance break-words">Profile</h2>
     {#if user}
-      <p class="text-sm"><span class="text-text-secondary">Name:</span> {user.name}</p>
-      <p class="text-sm"><span class="text-text-secondary">Email:</span> {user.email}</p>
-    {:else}<p class="text-sm text-text-secondary">Loading…</p>{/if}
+      <p class="w-full text-sm leading-relaxed break-words"><span class="text-text-secondary">Name:</span> {user.name}</p>
+      <p class="w-full text-sm leading-relaxed break-words"><span class="text-text-secondary">Email:</span> {user.email}</p>
+    {:else}<p class="w-full text-sm leading-relaxed text-text-secondary break-words">Loading…</p>{/if}
   </section>
-  <section class="rounded-xl border border-border bg-surface p-6 flex flex-col gap-4">
-    <h2 class="font-semibold">Preferences</h2>
-    <label class="flex items-center justify-between">
-      <span class="text-sm">Rest Ratio</span>
+  <section class="w-full rounded-xl border border-border bg-surface p-6 flex flex-col gap-4">
+    <h2 class="w-full font-semibold text-balance break-words">Preferences</h2>
+    <label class="flex items-center justify-between gap-2">
+      <span class="text-sm break-words">Rest Ratio</span>
       <select bind:value={restRatio} class="h-9 rounded-md border border-border bg-surface px-3 text-sm">
         <option value={3}>1 / 3</option>
         <option value={4}>1 / 4</option>
@@ -44,9 +44,9 @@
         <option value={6}>1 / 6</option>
       </select>
     </label>
-    <p class="text-xs text-text-secondary">Example: 30 min focus → {Math.floor(1800 / restRatio / 60)} min rest</p>
-    <label class="flex items-center justify-between">
-      <span class="text-sm">Theme</span>
+    <p class="w-full text-xs leading-relaxed text-text-secondary break-words">Example: 30 min focus → {Math.floor(1800 / restRatio / 60)} min rest</p>
+    <label class="flex items-center justify-between gap-2">
+      <span class="text-sm break-words">Theme</span>
       <select bind:value={theme} class="h-9 rounded-md border border-border bg-surface px-3 text-sm">
         <option value="light">Light</option>
         <option value="dark">Dark</option>
@@ -56,10 +56,10 @@
     <button class="h-10 rounded-md bg-primary text-white font-semibold disabled:opacity-50" onclick={save} disabled={saving}>
       {#if saving}Saving…{:else}Save{/if}
     </button>
-    {#if msg}<p class="text-sm text-success">{msg}</p>{/if}
+    {#if msg}<p class="w-full text-sm leading-relaxed text-success break-words">{msg}</p>{/if}
   </section>
-  <section class="rounded-xl border border-border bg-surface p-6">
-    <h2 class="font-semibold">About</h2>
-    <p class="text-sm text-text-secondary mt-1">Flowdoro v1.0.0 — Proportional rest timer.</p>
+  <section class="w-full rounded-xl border border-border bg-surface p-6">
+    <h2 class="w-full font-semibold text-balance break-words">About</h2>
+    <p class="w-full text-sm leading-relaxed text-text-secondary mt-1 text-balance break-words">Flowdoro v1.0.0 — Proportional rest timer.</p>
   </section>
 </div>

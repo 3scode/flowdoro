@@ -11,8 +11,8 @@
     </div>
   </nav>
   <section class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16 gap-6">
-    <h1 class="text-4xl md:text-5xl font-bold leading-tight">Work until your focus fades,<br /><span class="text-primary">rest in proportion.</span></h1>
-    <p class="text-lg text-text-secondary max-w-xl">Stop fighting the clock. Start flowing with it. Count up from zero — never get interrupted by a rigid countdown.</p>
+    <h1 class="text-4xl md:text-5xl font-bold leading-tight text-balance break-words">Work until your focus fades,<br /><span class="text-primary">rest in proportion.</span></h1>
+    <p class="w-full max-w-xl text-lg leading-relaxed text-text-secondary text-balance break-words">Stop fighting the clock. Start flowing with it. Count up from zero — never get interrupted by a rigid countdown.</p>
     <div class="w-64 h-64 rounded-full border-4 border-primary/20 flex items-center justify-center relative">
       <span class="text-5xl font-mono font-bold">01:23:45</span>
       <span class="absolute -bottom-2 bg-secondary text-white text-xs px-3 py-1 rounded-full">Earned Rest: 16m</span>
@@ -23,8 +23,8 @@
     {#each [{ n: '01', t: 'Start', d: 'Tap Start — timer counts up from zero' }, { n: '02', t: 'Focus', d: 'Work freely, no countdown pressure' }, { n: '03', t: 'Rest', d: 'Break auto-calculated at 5:1 ratio' }] as s}
       <div class="rounded-xl border border-border bg-surface p-6 text-center">
         <span class="text-3xl font-bold text-primary/30">{s.n}</span>
-        <h3 class="font-semibold mt-2">{s.t}</h3>
-        <p class="text-sm text-text-secondary mt-1">{s.d}</p>
+        <h3 class="font-semibold mt-2 text-balance break-words">{s.t}</h3>
+        <p class="text-sm leading-relaxed text-text-secondary mt-1 text-balance break-words">{s.d}</p>
       </div>
     {/each}
   </section>

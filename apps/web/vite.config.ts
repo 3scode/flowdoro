@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         $lib: path.resolve(__dirname, 'src/lib'),
       },
+      conditions: ['browser', 'svelte'],
     },
     server: {
       port: 5173,
