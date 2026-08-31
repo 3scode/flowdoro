@@ -44,7 +44,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** N/A
 **Related FR:** N/A
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** M
 **Tech Stack:** Bun, Docker, TypeScript
 **File yang diubah:** `package.json`, `docker-compose.yml`, `.env.example`, `apps/api/package.json`, `apps/web/package.json`
