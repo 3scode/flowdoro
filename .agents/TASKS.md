@@ -131,7 +131,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** N/A
 **Related FR:** N/A (dasar)
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** M
 **Tech Stack:** Drizzle ORM, PostgreSQL 16, drizzle-kit
 **File yang diubah:** `apps/api/src/db/schema.ts`, `apps/api/src/db/index.ts`, `apps/api/drizzle.config.ts`, `apps/api/src/db/migrations/*`
@@ -171,7 +171,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Login Screen, Register Screen
 **Related FR:** FR-01, FR-02, FR-03
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** ElysiaJS, Zod, jose, bcrypt
 **File yang diubah:** `apps/api/src/modules/auth/*`, `apps/api/src/middleware/auth.ts`
@@ -216,7 +216,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Focus Screen, Break Mode
 **Related FR:** FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** ElysiaJS, Zod, Drizzle
 **File yang diubah:** `apps/api/src/modules/session/*`
@@ -259,7 +259,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Dashboard, Analytics Screen
 **Related FR:** FR-16, FR-17, FR-18
 **Prioritas:** 🟡 Mid
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** ElysiaJS, Drizzle, PostgreSQL aggregate
 **File yang diubah:** `apps/api/src/modules/analytics/*`
@@ -298,7 +298,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Settings Screen
 **Related FR:** FR-12, FR-13, FR-14, FR-15, FR-19, FR-20
 **Prioritas:** 🟡 Mid
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** M
 **Tech Stack:** ElysiaJS, Zod, Cloudflare R2 (S3)
 **File yang diubah:** `apps/api/src/modules/profile/*`, `apps/api/src/modules/tasks/*`
@@ -335,7 +335,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Landing Page, Login Screen, Register Screen
 **Related FR:** FR-01, FR-02, FR-03
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** Svelte 5, Tailwind 4, TanStack Query
 **File yang diubah:** `apps/web/src/routes/+page.svelte`, `+login.svelte`, `+register.svelte`, `apps/web/src/lib/api/*`
@@ -375,7 +375,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Focus Screen, Break Mode
 **Related FR:** FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** XL
 **Tech Stack:** Svelte 5, requestAnimationFrame, IndexedDB, Service Worker
 **File yang diubah:** `apps/web/src/routes/+focus.svelte`, `apps/web/src/lib/components/focus/*`, `apps/web/src/lib/stores/timer.ts`, `apps/web/src/lib/db/*`
@@ -422,7 +422,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Dashboard, History Screen, Session Detail Screen
 **Related FR:** FR-12, FR-13, FR-14, FR-15, FR-16
 **Prioritas:** 🟡 Mid
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** Svelte 5, TanStack Query, Tailwind 4
 **File yang diubah:** `apps/web/src/routes/+dashboard.svelte`, `+history.svelte`, `+history/[id].svelte`, `apps/web/src/lib/components/*`
@@ -464,7 +464,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Analytics Screen, Settings Screen
 **Related FR:** FR-17, FR-18, FR-19, FR-20
 **Prioritas:** 🟡 Mid
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** L
 **Tech Stack:** Svelte 5, TanStack Query, Tailwind 4, Chart.js
 **File yang diubah:** `apps/web/src/routes/+analytics.svelte`, `+settings.svelte`, `apps/web/src/lib/components/analytics/*`
@@ -510,7 +510,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** Semua screen
 **Related FR:** N/A (cross-cutting)
 **Prioritas:** 🔴 High
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** M
 **Tech Stack:** ElysiaJS, Zod, Svelte
 **File yang diubah:** `apps/api/src/middleware/error.ts`, `apps/api/src/middleware/rateLimit.ts`, `apps/api/src/middleware/requestLog.ts`, `apps/web/src/lib/api/client.ts`
@@ -549,7 +549,7 @@ Design References: 0 (tidak ada design-references/)
 **Screen:** N/A
 **Related FR:** N/A
 **Prioritas:** 🟡 Mid
-**Status:** ⬜ Todo
+**Status:** ✅ Done
 **Effort:** M
 **Tech Stack:** Docker, Render
 **File yang diubah:** `apps/api/Dockerfile`, `render.yaml` (blueprint), `.env.production`

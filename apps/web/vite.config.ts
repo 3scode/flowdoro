@@ -1,10 +1,17 @@
 import { defineConfig, loadEnv } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    plugins: [svelte()],
+    plugins: [tailwindcss(), svelte()],
+    resolve: {
+      alias: {
+        $lib: path.resolve(__dirname, 'src/lib'),
+      },
+    },
     server: {
       port: 5173,
       proxy: {
@@ -18,8 +25,6 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    build: {
-      target: 'es2022',
-    },
+    build: { target: 'es2022' },
   }
 })

@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: flowdoro-api
+    env: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: ./apps/api
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - fromDatabase:
+          name: flowdoro-db
+          property: connectionString
+          key: DATABASE_URL
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://flowdoro.onrender.com
+      - key: COOKIE_SECURE
+        value: true
+  - type: web
+    name: flowdoro-web
+    env: static
+    buildCommand: bun install && bun run build
+    staticPublishPath: ./apps/web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: flowdoro-db
+    plan: starter
+    databaseName: flowdoro
+    user: flowdoro
