@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "context7": { "enabled": true },
+    "exa": { "enabled": true },
+    "sequential-thinking": { "enabled": true },
+    "iconify": { "enabled": true },
+    "image-downloader": { "enabled": true },
+    "filesystem": { "enabled": true },
+    "agentation": { "enabled": true }
+  }
+}
