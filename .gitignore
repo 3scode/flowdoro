@@ -3,6 +3,10 @@ dist/
 build/
 .env
 .env.local
+.env.render
+.env.render.*
+.env.production
+.env.web.production
 *.log
 .DS_Store
 .tmp/
