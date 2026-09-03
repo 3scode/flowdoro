@@ -1,0 +1,27 @@
+- generic [ref=f47e3]:
+  - navigation "Main navigation" [ref=f47e4]:
+    - generic [ref=f47e5]: Flowdoro
+    - button "Dashboard" [ref=f47e7]
+    - button "Focus" [ref=f47e9]
+    - button "Tasks" [ref=f47e11]
+    - button "History" [ref=f47e13]
+    - button "Analytics" [ref=f47e15]
+    - button "Settings" [ref=f47e17]
+  - generic [ref=f47e19]:
+    - banner [ref=f47e20]:
+      - generic [ref=f47e21]: ◉ Flowdoro
+      - button "Guest" [ref=f47e23]
+    - main [ref=f47e24]:
+      - generic [ref=f47e25]:
+        - generic [ref=f47e26]:
+          - generic [ref=f47e27]:
+            - heading "Tasks" [level=1] [ref=f47e29]
+            - generic [ref=f47e30]: 0 pending
+          - button "New Task" [ref=f47e31]
+        - generic [ref=f47e33]:
+          - complementary [ref=f47e34]:
+            - button "All Tasks" [ref=f47e35]
+            - button "Today" [ref=f47e36]
+            - button "Scheduled" [ref=f47e37]
+            - button "Completed" [ref=f47e38]
+          - main [ref=f47e39]

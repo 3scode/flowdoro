@@ -1,0 +1,22 @@
+- generic [ref=f8e22]:
+  - navigation "Main navigation" [ref=f8e23]:
+    - generic [ref=f8e24]: Flowdoro
+    - button "Dashboard" [ref=f8e26]
+    - button "Focus" [ref=f8e28]
+    - button "History" [ref=f8e30]
+    - button "Analytics" [ref=f8e32]
+    - button "Settings" [ref=f8e34]
+  - generic [ref=f8e36]:
+    - banner [ref=f8e37]:
+      - generic [ref=f8e38]: ◉ Flowdoro
+      - generic [ref=f8e39]:
+        - button "Playwright Test" [ref=f8e40]
+        - button "Logout" [ref=f8e41]
+    - main [ref=f8e42]:
+      - generic [ref=f8e43]:
+        - heading "Dashboard" [level=1] [ref=f8e44]
+        - generic [ref=f8e45]:
+          - generic [ref=f8e46]: ⏱
+          - heading "Ready to focus?" [level=3] [ref=f8e47]
+          - paragraph [ref=f8e48]: Start your first focus session. Work as long as you need.
+          - button "Start Focusing" [ref=f8e49]

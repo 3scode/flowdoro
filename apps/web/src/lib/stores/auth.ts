@@ -16,14 +16,21 @@ function createAuth() {
     },
     async login(email: string, password: string) {
       const res = await api.post('/api/auth/login', { email, password })
-      set(res.data); return res.data
+      const user = res.data
+      if (user?.token) localStorage.setItem('flowdoro_token', user.token)
+      set(user)
+      return user
     },
     async register(name: string, email: string, password: string) {
       const res = await api.post('/api/auth/register', { name, email, password })
-      set(res.data); return res.data
+      const user = res.data
+      if (user?.token) localStorage.setItem('flowdoro_token', user.token)
+      set(user)
+      return user
     },
     async logout() {
       await api.post('/api/auth/logout')
+      localStorage.removeItem('flowdoro_token')
       set(null)
     },
     set,

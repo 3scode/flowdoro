@@ -1,0 +1,125 @@
+- generic [active] [ref=f15e1]:
+  - generic [ref=f15e22]:
+    - navigation "Main navigation" [ref=f15e23]:
+      - generic [ref=f15e24]: Flowdoro
+      - button "Dashboard" [ref=f15e26]
+      - button "Focus" [ref=f15e28]
+      - button "Tasks" [ref=f15e30]
+      - button "History" [ref=f15e32]
+      - button "Analytics" [ref=f15e34]
+      - button "Settings" [ref=f15e36]
+    - generic [ref=f15e38]:
+      - banner [ref=f15e39]:
+        - generic [ref=f15e40]: ◉ Flowdoro
+        - generic [ref=f15e41]:
+          - button "Demo User" [ref=f15e42]
+          - button "Logout" [ref=f15e43]
+      - main [ref=f15e44]:
+        - generic [ref=f15e45]:
+          - heading "Dashboard" [level=1] [ref=f15e46]
+          - generic [ref=f15e47]:
+            - generic [ref=f15e48]:
+              - paragraph [ref=f15e49]: Today's Focus
+              - paragraph [ref=f15e50]: 9h 5m
+            - generic [ref=f15e51]:
+              - paragraph [ref=f15e52]: Total Focus
+              - paragraph [ref=f15e53]: 43h 37m
+            - generic [ref=f15e54]:
+              - generic [ref=f15e55]:
+                - paragraph [ref=f15e56]: Streak
+                - paragraph [ref=f15e57]: 5 days
+              - generic [ref=f15e58]: 🔥
+          - button "▶ Start Focusing" [ref=f15e59]
+          - generic [ref=f15e60]:
+            - heading "Recent Sessions" [level=3] [ref=f15e61]
+            - generic [ref=f15e62]:
+              - generic [ref=f15e63]:
+                - generic [ref=f15e64]: 59m 14s · Rest 11m 50s
+                - generic [ref=f15e65]: 5:43:35 AM
+              - generic [ref=f15e66]:
+                - generic [ref=f15e67]: 1h 10m · Rest 14m 1s
+                - generic [ref=f15e68]: 5:43:35 AM
+              - generic [ref=f15e69]:
+                - generic [ref=f15e70]: 11m 19s · Rest 2m 15s
+                - generic [ref=f15e71]: 5:43:35 AM
+              - generic [ref=f15e72]:
+                - generic [ref=f15e73]: 1h 15m · Rest 15m 3s
+                - generic [ref=f15e74]: 5:32:28 AM
+              - generic [ref=f15e75]:
+                - generic [ref=f15e76]: 1h 38m · Rest 19m 40s
+                - generic [ref=f15e77]: 5:32:28 AM
+  - button [ref=f15e17] [cursor=pointer]:
+    - generic:
+      - generic:
+        - button
+      - generic:
+        - button
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button
+      - generic:
+        - button
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+            - paragraph: v3.0.2
+            - button "Switch to light mode"
+          - generic:
+            - generic:
+              - generic: Output Detail
+              - button "Standard"
+            - generic:
+              - generic: React Components
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic: Hide Until Restart
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+              - generic: Clear on copy/send
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks"
+        - generic:
+          - button "Manage MCP & Webhooks"
+          - generic:
+            - generic: MCP Connection
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic: Webhooks
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"

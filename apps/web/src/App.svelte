@@ -9,6 +9,7 @@
   import History from '$lib/pages/History.svelte'
   import Analytics from '$lib/pages/Analytics.svelte'
   import Settings from '$lib/pages/Settings.svelte'
+  import Tasks from '$lib/pages/Tasks.svelte'
   import Navigation from '$lib/components/layout/Navigation.svelte'
   import Agentation from '$lib/components/Agentation.svelte'
 
@@ -39,6 +40,11 @@
 
   const isPublic = $derived(publicPaths.includes(path))
   const needsAuth = $derived(!isPublic && !user && path !== '/')
+  $effect(() => {
+    if (!isPublic && localStorage.getItem('flowdoro_token')) {
+      auth.fetchMe()
+    }
+  })
 </script>
 
 {#if path === '/'}
@@ -64,6 +70,7 @@
         {:else if path === '/history'}<History />
         {:else if path === '/analytics'}<Analytics />
         {:else if path === '/settings'}<Settings />
+        {:else if path === '/tasks'}<Tasks />
         {:else}
           <div class="p-12 text-center"><p>Page not found</p><button class="text-primary" onclick={() => navigate('/dashboard')}>Go to Dashboard</button></div>
         {/if}

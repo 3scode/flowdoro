@@ -1,0 +1,99 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e22]:
+    - navigation "Main navigation" [ref=f1e23]:
+      - generic [ref=f1e24]: Flowdoro
+      - button "Dashboard" [ref=f1e26]
+      - button "Focus" [ref=f1e28]
+      - button "Tasks" [ref=f1e30]
+      - button "History" [ref=f1e32]
+      - button "Analytics" [ref=f1e34]
+      - button "Settings" [ref=f1e36]
+    - generic [ref=f1e38]:
+      - banner [ref=f1e39]:
+        - generic [ref=f1e40]: ◉ Flowdoro
+        - generic [ref=f1e41]:
+          - button "Demo User" [ref=f1e42]
+          - button "Logout" [ref=f1e43]
+      - main [ref=f1e44]:
+        - generic [ref=f1e45]:
+          - heading "Dashboard" [level=1] [ref=f1e46]
+          - generic [ref=f1e47]:
+            - generic [ref=f1e48]: ⏱
+            - heading "Ready to focus?" [level=3] [ref=f1e49]
+            - paragraph [ref=f1e50]: Start your first focus session. Work as long as you need.
+            - button "Start Focusing" [ref=f1e51]
+  - button [ref=f1e17] [cursor=pointer]:
+    - generic:
+      - generic:
+        - button
+      - generic:
+        - button
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button
+      - generic:
+        - button
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+            - paragraph: v3.0.2
+            - button "Switch to light mode"
+          - generic:
+            - generic:
+              - generic: Output Detail
+              - button "Standard"
+            - generic:
+              - generic: React Components
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic: Hide Until Restart
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+              - generic: Clear on copy/send
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks"
+        - generic:
+          - button "Manage MCP & Webhooks"
+          - generic:
+            - generic: MCP Connection
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic: Webhooks
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"

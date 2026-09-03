@@ -1,19 +1,36 @@
 import { Elysia, t } from 'elysia'
-import { hash, compare } from 'bcryptjs'
-import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { users } from '../../db/schema'
-import { signToken } from '../../middleware/auth'
+import { ID, Account } from 'node-appwrite'
+import { getAdminClient, getDatabases, getUsers, appwrite, Query } from '../../lib/appwrite'
 import { env } from '../../config/env'
+import { SESSION_COOKIE } from '../../middleware/auth'
 
-const loginAttempts = new Map<string, { count: number; until: number }>()
+function serializeProfile(doc: any) {
+  if (!doc) return null
+  return {
+    id: doc.$id,
+    userId: doc.userId,
+    email: doc.email,
+    name: doc.name,
+    avatarUrl: doc.avatarUrl ?? null,
+    restRatio: doc.restRatio ?? 5,
+    theme: doc.theme ?? 'system',
+    notificationsEnabled: doc.notificationsEnabled ?? false,
+    soundEnabled: doc.soundEnabled ?? false,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  }
+}
 
-function checkRateLimit(key: string): boolean {
-  const entry = loginAttempts.get(key)
-  if (!entry) return true
-  if (Date.now() > entry.until) { loginAttempts.delete(key); return true }
-  if (entry.count >= 5) return false
-  return true
+function setSessionCookie(cookie: any, sessionSecret: string) {
+  ;(cookie as any)[SESSION_COOKIE]?.set({
+    value: sessionSecret,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: env.nodeEnv === 'production',
+    maxAge: 7 * 24 * 3600,
+    path: '/',
+    // No domain — browser defaults to request host (works with Vite proxy)
+  })
 }
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
@@ -22,38 +39,71 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
     if (!name || name.length < 2) { set.status = 422; return { success: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'Name min 2 chars' }, meta: null } }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { set.status = 422; return { success: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'Invalid email' }, meta: null } }
     if (!password || password.length < 8) { set.status = 422; return { success: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'Password min 8 chars' }, meta: null } }
-    const existing = await db.query.users.findFirst({ where: (u, { eq }) => eq(u.email, email) })
-    if (existing) { set.status = 409; return { success: false, data: null, error: { code: 'CONFLICT', message: 'Email already registered' }, meta: null } }
-    const passwordHash = await hash(password, env.bcryptRounds)
-    const [user] = await db.insert(users).values({ name, email: email.toLowerCase(), passwordHash }).returning()
-    const token = await signToken({ id: user.id, email: user.email })
-    ;(cookie as any).token?.set({ value: token, httpOnly: true, sameSite: 'lax', secure: env.cookieSecure, maxAge: 7 * 24 * 3600, path: '/' })
-    return { success: true, data: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, restRatio: user.restRatio, theme: user.theme }, error: null, meta: null }
+
+    let appwriteUser: any
+    try {
+      const users = getUsers()
+      appwriteUser = await users.create(ID.unique(), email.toLowerCase(), undefined, password, name)
+    } catch (e: any) {
+      const msg = e?.message ?? ''
+      if (/already|exists|in use/i.test(msg)) {
+        set.status = 409
+        return { success: false, data: null, error: { code: 'CONFLICT', message: 'Email already registered' }, meta: null }
+      }
+      throw e
+    }
+
+    try {
+      const databases = getDatabases()
+      await databases.createDocument(appwrite.databaseId, appwrite.collections.profiles, ID.unique(), {
+        userId: appwriteUser.$id,
+        email: email.toLowerCase(),
+        name,
+        restRatio: 5,
+        theme: 'system',
+        notificationsEnabled: false,
+        soundEnabled: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    } catch (e) {
+      console.error('profile create failed', e)
+    }
+
+    let sessionSecret = ''
+    try {
+      const account = new Account(getAdminClient())
+      const session: any = await account.createEmailPasswordSession(email.toLowerCase(), password)
+      sessionSecret = session.secret ?? ''
+    } catch {
+      sessionSecret = ''
+    }
+
+    if (sessionSecret) setSessionCookie(cookie, sessionSecret)
+
+    const profile = serializeProfile({ $id: appwriteUser.$id, userId: appwriteUser.$id, email: email.toLowerCase(), name, avatarUrl: null, restRatio: 5, theme: 'system', notificationsEnabled: false, soundEnabled: false })
+    // Return access_token for SPA Bearer token auth
+    return { success: true, data: { ...profile, token: sessionSecret }, error: null, meta: null }
   }, { body: t.Object({ name: t.String(), email: t.String(), password: t.String() }) })
 
-  .post('/login', async ({ body, set, cookie, request }) => {
+  .post('/login', async ({ body, set, cookie }) => {
     const { email, password } = body as any
-    const ip = request.headers.get('x-forwarded-for') ?? 'local'
-    if (!checkRateLimit(ip)) { set.status = 429; return { success: false, data: null, error: { code: 'RATE_LIMITED', message: 'Too many attempts, try again in 15 minutes' }, meta: null } }
-    const user = await db.query.users.findFirst({ where: (u, { eq }) => eq(u.email, email.toLowerCase()) })
-    if (!user || !user.passwordHash) {
-      const e = loginAttempts.get(ip) ?? { count: 0, until: Date.now() + 15 * 60 * 1000 }
-      e.count++; loginAttempts.set(ip, e)
-      set.status = 401; return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Invalid email or password' }, meta: null }
+    try {
+      const account = new Account(getAdminClient())
+      const session: any = await account.createEmailPasswordSession(email.toLowerCase(), password)
+      if (session.secret) setSessionCookie(cookie, session.secret)
+      const databases = getDatabases()
+      const res = await databases.listDocuments(appwrite.databaseId, appwrite.collections.profiles, [Query.equal('email', email.toLowerCase())])
+      const profile = serializeProfile(res.documents[0] ?? null)
+      // Return access_token for SPA Bearer token auth
+      return { success: true, data: { ...profile, token: session.secret ?? '' }, error: null, meta: null }
+    } catch {
+      set.status = 401
+      return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Invalid email or password' }, meta: null }
     }
-    const ok = await compare(password, user.passwordHash)
-    if (!ok) {
-      const e = loginAttempts.get(ip) ?? { count: 0, until: Date.now() + 15 * 60 * 1000 }
-      e.count++; loginAttempts.set(ip, e)
-      set.status = 401; return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Invalid email or password' }, meta: null }
-    }
-    loginAttempts.delete(ip)
-    const token = await signToken({ id: user.id, email: user.email })
-    ;(cookie as any).token?.set({ value: token, httpOnly: true, sameSite: 'lax', secure: env.cookieSecure, maxAge: 7 * 24 * 3600, path: '/' })
-    return { success: true, data: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, restRatio: user.restRatio, theme: user.theme }, error: null, meta: null }
   }, { body: t.Object({ email: t.String(), password: t.String() }) })
 
   .post('/logout', ({ cookie }) => {
-    ;(cookie as any).token?.remove()
+    ;(cookie as any)[SESSION_COOKIE]?.remove()
     return { success: true, data: null, error: null, meta: null }
   })

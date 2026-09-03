@@ -1,32 +1,32 @@
 import { Elysia } from 'elysia'
-import { jwtVerify, SignJWT } from 'jose'
-import { env } from '../config/env'
+import { Account } from 'node-appwrite'
+import { getSessionClient, getProfile } from '../lib/appwrite'
 
-const secret = new TextEncoder().encode(env.jwtSecret)
+export const SESSION_COOKIE = 'token'
 
-export async function signToken(payload: Record<string, unknown>) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(env.jwtExpiresIn)
-    .sign(secret)
-}
-
-export async function verifyToken(token: string) {
-  const { payload } = await jwtVerify(token, secret)
-  return payload as { id: string; email: string }
+export async function getUserFromSession(sessionSecret: string) {
+  const account = new Account(getSessionClient(sessionSecret))
+  const session = await account.get()
+  return { id: session.$id, email: session.email, name: session.name }
 }
 
 export const authGuard = new Elysia()
   .derive(async ({ cookie, headers, set }) => {
-    const token = (cookie as any)?.token?.value ?? headers['authorization']?.replace('Bearer ', '')
-    if (!token) {
+    const secret = (cookie as any)?.token?.value ?? headers['authorization']?.replace('Bearer ', '') ?? ''
+    if (!secret) {
       set.status = 401
       throw new Error('UNAUTHORIZED')
     }
     try {
-      const payload = await verifyToken(token)
-      return { user: payload }
+      const account = new Account(getSessionClient(secret))
+      const session = await account.get()
+      let profile: any = null
+      try {
+        profile = await getProfile(session.$id)
+      } catch {
+        profile = null
+      }
+      return { user: { id: session.$id, email: session.email, name: session.name, profile } }
     } catch {
       set.status = 401
       throw new Error('UNAUTHORIZED')

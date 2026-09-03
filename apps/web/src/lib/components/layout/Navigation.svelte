@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { LayoutDashboard, Timer, History, BarChart3, Settings, LogOut } from 'lucide-svelte'
+  import { LayoutDashboard, Timer, History, BarChart3, Settings, LogOut, CheckSquare } from 'lucide-svelte'
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/focus', label: 'Focus', icon: Timer },
+    { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/history', label: 'History', icon: History },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/settings', label: 'Settings', icon: Settings },

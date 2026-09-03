@@ -1,0 +1,172 @@
+- generic [ref=f27e1]:
+  - generic [ref=f27e3]:
+    - navigation "Main navigation" [ref=f27e4]:
+      - generic [ref=f27e5]: Flowdoro
+      - button "Dashboard" [ref=f27e7]
+      - button "Focus" [ref=f27e9]
+      - button "Tasks" [ref=f27e11]
+      - button "History" [ref=f27e13]
+      - button "Analytics" [ref=f27e15]
+      - button "Settings" [ref=f27e17]
+    - generic [ref=f27e19]:
+      - banner [ref=f27e20]:
+        - generic [ref=f27e21]: ◉ Flowdoro
+        - generic [ref=f27e22]:
+          - button "Demo User" [ref=f27e23]
+          - button "Logout" [ref=f27e24]
+      - main [ref=f27e25]:
+        - generic [ref=f27e26]:
+          - generic [ref=f27e27]:
+            - generic [ref=f27e28]:
+              - heading "Tasks" [level=1] [ref=f27e30]
+              - generic [ref=f27e31]: 15 pending
+            - button "New Task" [ref=f27e32]
+          - generic [ref=f27e34]:
+            - complementary [ref=f27e35]:
+              - button "All Tasks" [ref=f27e36]
+              - button "Today" [ref=f27e37]
+              - button "Scheduled" [ref=f27e38]
+              - button "Completed" [ref=f27e39]
+            - main [ref=f27e40]:
+              - generic [ref=f27e101]:
+                - generic [ref=f27e102]:
+                  - generic [ref=f27e103]: New Task
+                  - button [ref=f27e104]
+                - textbox "Task title *" [ref=f27e106]: E2E Test Task
+                - text: placeholder="Description (optional)" bind:value= rows=2 class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary resize-none" />
+                - generic [ref=f27e107]:
+                  - generic [ref=f27e108]:
+                    - textbox [ref=f27e110]
+                    - textbox [ref=f27e111]
+                  - combobox [active] [ref=f27e114]:
+                    - option "None"
+                    - option "Low"
+                    - option "Medium"
+                    - option "High" [selected]
+                - button "Create Task" [ref=f27e115]
+              - generic [ref=f27e41]:
+                - listitem [ref=f27e42]:
+                  - button [ref=f27e43]
+                  - paragraph [ref=f27e45]: Writing
+                - listitem [ref=f27e46]:
+                  - button [ref=f27e47]
+                  - paragraph [ref=f27e49]: Bug Fix
+                - listitem [ref=f27e50]:
+                  - button [ref=f27e51]
+                  - paragraph [ref=f27e53]: Design
+                - listitem [ref=f27e54]:
+                  - button [ref=f27e55]
+                  - paragraph [ref=f27e57]: Study
+                - listitem [ref=f27e58]:
+                  - button [ref=f27e59]
+                  - paragraph [ref=f27e61]: Deep Work
+                - listitem [ref=f27e62]:
+                  - button [ref=f27e63]
+                  - paragraph [ref=f27e65]: Writing
+                - listitem [ref=f27e66]:
+                  - button [ref=f27e67]
+                  - paragraph [ref=f27e69]: Bug Fix
+                - listitem [ref=f27e70]:
+                  - button [ref=f27e71]
+                  - paragraph [ref=f27e73]: Design
+                - listitem [ref=f27e74]:
+                  - button [ref=f27e75]
+                  - paragraph [ref=f27e77]: Study
+                - listitem [ref=f27e78]:
+                  - button [ref=f27e79]
+                  - paragraph [ref=f27e81]: Deep Work
+                - listitem [ref=f27e82]:
+                  - button [ref=f27e83]
+                  - generic:
+                    - paragraph
+                - listitem [ref=f27e84]:
+                  - button [ref=f27e85]
+                  - generic:
+                    - paragraph
+                - listitem [ref=f27e86]:
+                  - button [ref=f27e87]
+                  - generic:
+                    - paragraph
+                - listitem [ref=f27e88]:
+                  - button [ref=f27e89]
+                  - generic:
+                    - paragraph
+                - listitem [ref=f27e90]:
+                  - button [ref=f27e91]
+                  - generic:
+                    - paragraph
+  - button [ref=f27e93] [cursor=pointer]:
+    - generic:
+      - generic:
+        - button
+      - generic:
+        - button
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button
+      - generic:
+        - button
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+            - paragraph: v3.0.2
+            - button "Switch to light mode"
+          - generic:
+            - generic:
+              - generic: Output Detail
+              - button "Standard"
+            - generic:
+              - generic: React Components
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic: Hide Until Restart
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+              - generic: Clear on copy/send
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks"
+        - generic:
+          - button "Manage MCP & Webhooks"
+          - generic:
+            - generic: MCP Connection
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic: Webhooks
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"

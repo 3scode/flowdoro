@@ -19,6 +19,15 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: env.API_URL ?? 'http://localhost:3000',
           changeOrigin: true,
+          cookieDomainRewrite: { 'localhost:3000': '' },
+          cookiePathRewrite: { '/': '' },
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq, req) => {
+              // Forward Authorization header
+              const auth = req.headers?.authorization
+              if (auth) proxyReq.setHeader('Authorization', auth)
+            })
+          },
         },
         '/health': {
           target: env.API_URL ?? 'http://localhost:3000',

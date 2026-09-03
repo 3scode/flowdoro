@@ -1,0 +1,107 @@
+- generic [active] [ref=f44e1]:
+  - generic [ref=f44e3]:
+    - navigation "Main navigation" [ref=f44e4]:
+      - generic [ref=f44e5]: Flowdoro
+      - button "Dashboard" [ref=f44e7]
+      - button "Focus" [ref=f44e9]
+      - button "Tasks" [ref=f44e11]
+      - button "History" [ref=f44e13]
+      - button "Analytics" [ref=f44e15]
+      - button "Settings" [ref=f44e17]
+    - generic [ref=f44e19]:
+      - banner [ref=f44e20]:
+        - generic [ref=f44e21]: ◉ Flowdoro
+        - button "Guest" [ref=f44e23]
+      - main [ref=f44e24]:
+        - generic [ref=f44e25]:
+          - generic [ref=f44e26]:
+            - generic [ref=f44e27]:
+              - heading "Tasks" [level=1] [ref=f44e29]
+              - generic [ref=f44e30]: 0 pending
+            - button "New Task" [ref=f44e31]
+          - generic [ref=f44e33]:
+            - complementary [ref=f44e34]:
+              - button "All Tasks" [ref=f44e35]
+              - button "Today" [ref=f44e36]
+              - button "Scheduled" [ref=f44e37]
+              - button "Completed" [ref=f44e38]
+            - main [ref=f44e39]:
+              - generic [ref=f44e40]:
+                - paragraph [ref=f44e41]: No tasks here
+                - paragraph [ref=f44e42]: Create your first task to stay organized.
+                - button "+ New Task" [ref=f44e43]
+  - button [ref=f44e45] [cursor=pointer]:
+    - generic:
+      - generic:
+        - button
+      - generic:
+        - button
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button [disabled]
+      - generic:
+        - button
+      - generic:
+        - button
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+            - paragraph: v3.0.2
+            - button "Switch to light mode"
+          - generic:
+            - generic:
+              - generic: Output Detail
+              - button "Standard"
+            - generic:
+              - generic: React Components
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic: Hide Until Restart
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+              - generic: Clear on copy/send
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks"
+        - generic:
+          - button "Manage MCP & Webhooks"
+          - generic:
+            - generic: MCP Connection
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic: Webhooks
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"
