@@ -41,10 +41,10 @@ async function seed() {
 
   const taskNames = ['Deep Work', 'Study', 'Design', 'Bug Fix', 'Writing']
   const taskIds: string[] = []
-  for (const name of taskNames) {
+  for (let i = 0; i < taskNames.length; i++) {
     const t = await databases.createDocument(appwrite.databaseId, appwrite.collections.tasks, ID.unique(), {
       userId,
-      name,
+      name: taskNames[i],
       starred: i === 0,
       createdAt: new Date().toISOString(),
     }).catch((e) => {
