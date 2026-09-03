@@ -28,9 +28,10 @@ function buildQueries(queries: [string, string | number, string?][]) {
   }).join('&')
 }
 
-export async function dbList(e: EnvVars, collection: string, queries: [string, string | number][] = []) {
+export async function dbList(e: EnvVars, collection: string, queries: [string, string | number][] = [], limit = 100, offset = 0) {
   const qs = queries.length ? buildQueries(queries.map(([a, v]) => [a, v, 'string'] as [string, string | number, string])) : ''
-  const res = await fetch(`${BASE(e)}/collections/${collection}/documents${qs ? '?' + qs : ''}`, { headers: HEADERS(e) })
+  const limitQs = `limit=${limit}&offset=${offset}`
+  const res = await fetch(`${BASE(e)}/collections/${collection}/documents${qs ? '?' + qs + '&' : '?'}${limitQs}`, { headers: HEADERS(e) })
   return res.json() as Promise<{ documents: any[]; total: number }>
 }
 
