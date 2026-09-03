@@ -14,6 +14,7 @@ export const authMiddleware: MiddlewareHandler<Env> = async (c, next) => {
     })
     if (!accountRes.ok) throw new Error('Invalid session')
     const session: any = await accountRes.json()
+    // session.userId is the Appwrite user ID; fall back to $id if unavailable
     const userId = session.userId ?? session.$id
     c.set('user', { id: userId, email: session.email, name: session.name, profile: null })
     await next()

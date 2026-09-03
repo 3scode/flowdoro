@@ -61,7 +61,7 @@ auth.post('/register', async (c) => {
     const cookieHdr = loginRes.headers.get('set-cookie') ?? ''
     const sessionSecret = extractSecretFromCookie(cookieHdr, e.appwriteProjectId)
     const profile = serializeProfile({ $id: user.$id, userId: user.$id, email: emailLower, name, avatarUrl: null, restRatio: 5, theme: 'system', notificationsEnabled: false, soundEnabled: false })
-    return c.json({ success: true, data: { ...profile, token: sessionSecret }, error: null, meta: null }, 201)
+    return c.json({ success: true, data: { ...profile, id: user.$id, token: sessionSecret }, error: null, meta: null }, 201)
   } catch (err: any) {
     console.error('register failed', err.message)
     return json(c, { success: false, data: null, error: { code: 'INTERNAL_ERROR', message: err?.message ?? 'Registration failed' }, meta: null }, 500)
@@ -85,7 +85,7 @@ auth.post('/login', async (c) => {
     const cookieHdr = loginRes.headers.get('set-cookie') ?? ''
     const sessionSecret = extractSecretFromCookie(cookieHdr, e.appwriteProjectId)
     const profile = await dbList(e, e.appwriteCollectionProfiles, [['email', emailLower]]).then(r => r.documents?.[0] ?? null)
-    return c.json({ success: true, data: { ...serializeProfile(profile), token: sessionSecret }, error: null, meta: null }, 200)
+    return c.json({ success: true, data: { ...serializeProfile(profile), id: profile?.userId ?? profile?.$id, token: sessionSecret }, error: null, meta: null }, 200)
   } catch {
     return json(c, { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Invalid email or password' }, meta: null }, 401)
   }
