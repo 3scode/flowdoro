@@ -15,21 +15,28 @@ tasks.get('/', async (c) => {
   const parentId = url.searchParams.get('parentId')
   const listId = url.searchParams.get('listId')
   const status = url.searchParams.get('status')
-  const filters: [string, string | number][] = [['userId', userId]]
+  let r: any
   if (parentId) {
-    filters.push(['parentId', parentId])
+    // get subtasks of given parent
+    r = await dbList(e, e.appwriteCollectionTasks, [['userId', userId], ['parentId', parentId]])
+  } else if (listId) {
+    // get tasks with exact listId match (filter manually for null listId)
+    const all = await dbList(e, e.appwriteCollectionTasks, [['userId', userId]])
+    const docs = all.documents.filter((d: any) => d.listId === listId && !d.parentId)
+    return c.json({ success: true, data: docs, error: null, meta: null })
   } else {
-    // get top-level tasks (no parentId)
-    const all = await dbList(e, e.appwriteCollectionTasks, filters)
-    const topLevel = all.documents.filter((d: any) => !d.parentId)
-    return c.json({ success: true, data: topLevel, error: null, meta: null })
+    // top-level tasks only (no parentId), optionally filter by listId='none'
+    r = await dbList(e, e.appwriteCollectionTasks, [['userId', userId]])
+    const docs = r.documents.filter((d: any) => !d.parentId)
+    if (status === 'done') {
+      r.documents = docs.filter((d: any) => d.completedAt)
+    } else if (status === 'pending') {
+      r.documents = docs.filter((d: any) => !d.completedAt)
+    } else {
+      r.documents = docs
+    }
+    return c.json({ success: true, data: r.documents, error: null, meta: null })
   }
-  if (listId) {
-    filters.push(['listId', listId])
-  } else {
-    filters.push(['listId', ''])
-  }
-  const r = await dbList(e, e.appwriteCollectionTasks, filters)
   const docs = r.documents
   const filtered = status === 'done'
     ? docs.filter((d: any) => d.completedAt)

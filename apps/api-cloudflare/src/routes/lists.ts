@@ -21,7 +21,7 @@ lists.post('/', async (c) => {
   // get max sortOrder to set next
   const existing = await dbList(e, e.appwriteCollectionLists, [['userId', c.get('user').id]])
   const nextSort = existing.documents.reduce((max: number, d: any) => Math.max(max, d.sortOrder ?? 0), 0) + 1
-  const doc = await dbCreate(e, e.appwriteCollectionLists, { userId: c.get('user').id, name, sortOrder: nextSort, createdAt: new Date().toISOString() })
+  const doc = await dbCreate(e, e.appwriteCollectionLists, { userId: c.get('user').id, name, sortOrder: nextSort })
   return c.json({ success: true, data: doc, error: null, meta: null }, 201)
 })
 
