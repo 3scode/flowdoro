@@ -9,14 +9,12 @@ export const authMiddleware: MiddlewareHandler<Env> = async (c, next) => {
   const token = getSessionToken(c.req.raw, e.appwriteProjectId)
   if (!token) return c.json({ success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, meta: null }, 401)
   try {
-    const accountRes = await fetch(`${e.appwriteEndpoint}/account/sessions/now`, {
+    const accountRes = await fetch(`${e.appwriteEndpoint}/account`, {
       headers: { 'x-appwrite-project': e.appwriteProjectId, 'cookie': `a_session_${e.appwriteProjectId}=${token}` },
     })
     if (!accountRes.ok) throw new Error('Invalid session')
-    const session: any = await accountRes.json()
-    // session.userId is the Appwrite user ID; fall back to $id if unavailable
-    const userId = session.userId ?? session.$id
-    c.set('user', { id: userId, email: session.email, name: session.name, profile: null })
+    const account: any = await accountRes.json()
+    c.set('user', { id: account.$id, email: account.email, name: account.name ?? account.email, profile: null })
     await next()
   } catch {
     return c.json({ success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, meta: null }, 401)
