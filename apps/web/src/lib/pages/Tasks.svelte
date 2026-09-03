@@ -239,8 +239,8 @@
       </div>
       {#if showNewList}
         <div class="px-2 pb-2 flex gap-1">
-          <input bind:value={newListName} placeholder="List name" class="flex-1 rounded border border-border bg-background px-2 py-1 text-sm outline-none" onkeydown={(e) => e.key === 'Enter' && createList()} />
-          <button class="text-xs px-2 py-1 bg-primary text-white rounded" onclick={createList}>Add</button>
+          <input bind:value={newListName} placeholder="列表名称" class="flex-1 rounded border border-border bg-background px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary transition" onkeydown={(e) => e.key === 'Enter' && createList()} />
+          <button class="text-xs px-2 py-1 bg-primary text-white rounded hover:bg-primary-hover transition disabled:opacity-50" onclick={createList} disabled={!newListName.trim()}>确定</button>
         </div>
       {/if}
       {#each lists as list}
