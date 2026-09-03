@@ -1,17 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { CheckSquare, Plus, CalendarDays, Clock, Flag, Trash2, X, Play, ChevronDown, ChevronRight, Timer, FolderOpen } from 'lucide-svelte'
+  import { CheckSquare, Plus, CalendarDays, Clock, Flag, Trash2, X, Play, ChevronDown, ChevronRight, Timer, FolderOpen, Star } from 'lucide-svelte'
   import { api } from '$lib/api/client'
   import { formatDuration } from '$lib/utils/time'
 
-  type Task = { id: string; title: string; description: string | null; dueDate: string | null; dueTime: string | null; priority: number; parentId: string | null; sortOrder: number; status: string; listId: string | null; createdAt: string }
+  type Task = { id: string; title: string; description: string | null; dueDate: string | null; dueTime: string | null; priority: number; parentId: string | null; sortOrder: number; status: string; listId: string | null; starred: boolean; createdAt: string }
   type List = { id: string; name: string; sortOrder: number }
   type TimeStats = Record<string, { totalFocusSeconds: number; sessionCount: number; restEarnedSeconds: number }>
 
   let tasks: Task[] = $state([])
   let lists: List[] = $state([])
   let loading = $state(true)
-  let filter = $state<'all' | 'today' | 'scheduled' | 'done'>('all')
+  let filter = $state<'all' | 'starred' | 'today' | 'scheduled' | 'done'>('all')
   let activeListId = $state<string | null>(null)
   let selectedId = $state<string | null>(null)
   let expanded = $state<Set<string>>(new Set())
@@ -127,6 +127,13 @@
     } catch (e: any) { showToast(e.message ?? 'Failed to toggle') }
   }
 
+  async function toggleStar(task: Task) {
+    try {
+      const updated: any = await api.tasks.star(task.id)
+      task.starred = updated.data?.starred ?? !task.starred
+    } catch (e: any) { showToast(e.message ?? 'Failed') }
+  }
+
   async function updateTaskField(task: Task, field: string, value: any) {
     try {
       await api.tasks.update(task.id, { [field]: value })
@@ -173,6 +180,7 @@
   function getFilteredTasks(): Task[] {
     const all = tasks.filter((t: Task) => !t.parentId)
     const inList = activeListId === null ? all : all.filter((t: Task) => t.listId === activeListId)
+    if (filter === 'starred') return inList.filter((t: Task) => t.starred)
     if (filter === 'today') {
       const today = new Date().toISOString().slice(0, 10)
       return inList.filter((t: Task) => t.dueDate === today && t.status !== 'done')
@@ -186,6 +194,7 @@
   }
 
   const pendingCount = $derived(tasks.filter((t: Task) => !t.parentId && t.status !== 'done').length)
+  const starredCount = $derived(tasks.filter((t: Task) => !t.parentId && t.starred && t.status !== 'done').length)
   const selectedTask = $derived<Task | null>(tasks.find((t: Task) => t.id === selectedId) ?? null)
 </script>
 
@@ -195,6 +204,7 @@
       <CheckSquare size={20} class="text-primary shrink-0" />
       <h1 class="text-lg font-bold text-balance break-words">Tasks</h1>
       <span class="text-xs text-text-secondary bg-surface-elevated px-2 py-0.5 rounded-full">{pendingCount} pending</span>
+      {#if starredCount > 0}<span class="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full">⭐ {starredCount}</span>{/if}
     </div>
     <button
       class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary-hover transition"
@@ -208,6 +218,7 @@
     <aside class="hidden md:flex flex-col w-48 border-r border-border bg-surface p-2 gap-1 shrink-0">
       {#each [
         { key: 'all' as const, label: 'All Tasks' },
+        { key: 'starred' as const, label: '⭐ Starred' },
         { key: 'today' as const, label: "Today's Focus" },
         { key: 'scheduled' as const, label: 'Scheduled' },
         { key: 'done' as const, label: 'Completed' },
@@ -255,7 +266,7 @@
 
     <main class="flex-1 overflow-auto p-4 pb-24 md:pb-4">
       <div class="flex md:hidden gap-1 mb-4 overflow-x-auto pb-2">
-        {#each ['all' as const,'today' as const,'scheduled' as const,'done' as const] as f}
+        {#each ['all' as const,'starred' as const,'today' as const,'scheduled' as const,'done' as const] as f}
           <button
             class="px-3 py-1.5 rounded-full text-sm border border-border whitespace-nowrap"
             class:bg-primary={filter === f && activeListId === null}
@@ -372,6 +383,9 @@
               </div>
 
               <div class="shrink-0 flex items-center gap-1 pr-1 opacity-0 group-hover:opacity-100 transition">
+                <button class="p-1.5 rounded hover:bg-yellow-500/10 text-yellow-500 transition" onclick={(e) => { e.stopPropagation(); toggleStar(task) }} title="Star">
+                  <Star size={14} class={task.starred ? 'fill-current' : ''} />
+                </button>
                 <button class="p-1.5 rounded hover:bg-primary/10 text-primary transition" onclick={(e) => { e.stopPropagation(); openInFocus(task) }} title="Start focus">
                   <Play size={14} />
                 </button>

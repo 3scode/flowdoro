@@ -15,6 +15,7 @@ tasks.get('/', async (c) => {
   const parentId = url.searchParams.get('parentId')
   const listId = url.searchParams.get('listId')
   const status = url.searchParams.get('status')
+  const starred = url.searchParams.get('starred') === 'true'
   let r: any
   if (parentId) {
     // get subtasks of given parent
@@ -35,6 +36,7 @@ tasks.get('/', async (c) => {
     } else {
       r.documents = docs
     }
+    if (starred) r.documents = r.documents.filter((d: any) => d.starred)
     return c.json({ success: true, data: r.documents, error: null, meta: null })
   }
   const docs = r.documents
@@ -59,7 +61,7 @@ tasks.post('/', async (c) => {
     title: title || name,
     description, dueDate, dueTime, priority: priority ?? 0,
     parentId, listId: listId ?? null,
-    sortOrder: 0, completedAt: null, createdAt: new Date().toISOString(),
+    sortOrder: 0, completedAt: null, createdAt: new Date().toISOString(), starred: body.starred ?? false,
   })
   return c.json({ success: true, data: doc, error: null, meta: null }, 201)
 })
@@ -84,8 +86,21 @@ tasks.patch('/:id', async (c) => {
   if (b.sortOrder !== undefined) updates.sortOrder = b.sortOrder
   if (b.status !== undefined) updates.status = b.status
   if (b.completedAt !== undefined) updates.completedAt = b.completedAt
+  if (b.starred !== undefined) updates.starred = b.starred
   const updated = await dbUpdate(e, e.appwriteCollectionTasks, c.req.param('id'), updates)
   return c.json({ success: true, data: updated, error: null, meta: null })
+})
+
+tasks.post('/:id/star', async (c) => {
+  const e = c.get('env')
+  try {
+    const doc: any = await dbGet(e, e.appwriteCollectionTasks, c.req.param('id'))
+    if (doc.userId !== c.get('user').id) return c.json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'Task not found' }, meta: null }, 404)
+    const updated = await dbUpdate(e, e.appwriteCollectionTasks, c.req.param('id'), { starred: !doc.starred })
+    return c.json({ success: true, data: updated, error: null, meta: null })
+  } catch {
+    return c.json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'Task not found' }, meta: null }, 404)
+  }
 })
 
 tasks.put('/reorder', async (c) => {

@@ -34,6 +34,7 @@ export const api = {
     update: (id: string, body: Record<string, any>) => req(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
     reorder: (tasks: { id: string; sortOrder: number }[]) => req('/api/tasks/reorder', { method: 'PUT', body: JSON.stringify({ tasks }) }),
     toggle: (id: string) => req(`/api/tasks/${id}/toggle`, { method: 'POST' }),
+    star: (id: string) => req(`/api/tasks/${id}/star`, { method: 'POST' }),
     delete: (id: string) => req(`/api/tasks/${id}`, { method: 'DELETE' }),
   },
   lists: {

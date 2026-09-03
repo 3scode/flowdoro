@@ -2,7 +2,7 @@
 
 Panduan step-by-step untuk menjalankan di local, mengetes, dan memastikan build siap deploy. Semua perintah **wajib pakai `bun`** (jangan `npm`/`node`).
 
-> Stack: Svelte 5 + Vite 6 + Tailwind 4 (web) + Bun + Elysia 1.4 (api) + **Hono 4 + Appwrite Web SDK** (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage) + Docker + Hugging Face Spaces. Sejak T-APPW, tidak ada lagi PostgreSQL/Drizzle/JWT/R2.
+> Stack: Svelte 5 + Vite 6 + Tailwind 4 (web) + Bun + Elysia 1.4 (api) + **Hono 4 + Appwrite Web SDK** (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage) + Docker + Hugging Face Spaces. Sejak T-APPW, tidak ada lagi PostgreSQL/Drizzle/JWT/R2. Collection: `profiles`, `tasks`, `sessions`, `session_events`, `lists`, `google_tokens` + bucket `avatars`.
 
 ---
 
@@ -48,7 +48,7 @@ cp .env.example .env
 ## 3. Siapkan Appwrite Cloud (sekali)
 
 1. Konsol → https://cloud.appwrite.io → buat project (region **Singapore**).
-2. Buat database `flowdoro` + 4 collections (`profiles`, `tasks`, `sessions`, `session_events`) + index — detail atribut di `env.md` §2.
+2. Buat database `flowdoro` + 6 collections (`profiles`, `tasks`, `sessions`, `session_events`, `lists`, `google_tokens`) + index — detail atribut di `env.md` §2.
 3. Buat bucket `avatars` (Storage).
 4. Buat API key (scope users/databases/storage/account read+write) → isi `APPWRITE_API_KEY`.
 5. Isi `.env` dengan nilai tersebut.
@@ -155,8 +155,11 @@ Workers & Pages → flowdoro-api → Settings → Variables → Add:
 | `APPWRITE_COLLECTION_TASKS` | `tasks` |
 | `APPWRITE_COLLECTION_SESSIONS` | `sessions` |
 | `APPWRITE_COLLECTION_EVENTS` | `session_events` |
+| `APPWRITE_COLLECTION_LISTS` | `lists` |
+| `APPWRITE_COLLECTION_GOOGLE_TOKENS` | `google_tokens` |
 | `APPWRITE_BUCKET_AVATARS` | `avatars` |
 | `CORS_ORIGIN` | `https://<web-url>` |
+| `FRONTEND_URL` | `https://<web-url>` |
 | `NODE_ENV` | `production` |
 
 **Secret** (tidak terlihat publik):
@@ -173,8 +176,8 @@ Flowdoro deploy ke HF Spaces gratis tanpa kartu kredit. **API** = Space Docker (
 1. hugginface.co → **New Space**:
    - Owner / Space name: `flowdoro-api`
    - License: MIT
-   - **Docker** (bukan Gradio) → `Dockerfile` di root repo (sudah `EXPOSE 7860`)
-2. Push repo → HF build Space dari `Dockerfile` root.
+    - **Docker** (bukan Gradio) → `apps/api/Dockerfile` (sudah `EXPOSE 7860`)
+ 2. Push repo → HF build Space dari `apps/api/Dockerfile`.
 3. Set **Settings → Variables and secrets**:
 
    **Variables** (terlihat publik — jangan taruh rahasia):
@@ -189,10 +192,14 @@ Flowdoro deploy ke HF Spaces gratis tanpa kartu kredit. **API** = Space Docker (
    | `APPWRITE_COLLECTION_TASKS` | `tasks` |
    | `APPWRITE_COLLECTION_SESSIONS` | `sessions` |
    | `APPWRITE_COLLECTION_EVENTS` | `session_events` |
+   | `APPWRITE_COLLECTION_LISTS` | `lists` |
+   | `APPWRITE_COLLECTION_GOOGLE_TOKENS` | `google_tokens` |
    | `APPWRITE_BUCKET_AVATARS` | `avatars` |
    | `CORS_ORIGIN` | `https://<username>-flowdoro-web.hf.space` (atau URL web) |
    | `APP_URL` | URL web |
    | `API_URL` | `https://<username>-flowdoro-api.hf.space` |
+   | `FRONTEND_URL` | URL web |
+   | `REST_RATIO_DEFAULT` | `5` |
    | `LOG_LEVEL` | `info` |
 
    **Secret** (wajib, tidak terlihat publik):
@@ -200,9 +207,11 @@ Flowdoro deploy ke HF Spaces gratis tanpa kartu kredit. **API** = Space Docker (
    |---|---|
    | `APPWRITE_API_KEY` | Server API key dari Console (role users/databases/storage/account) |
 
-4. **Factory reboot** setelah set env.
+ 4. **Factory reboot** setelah set env.
 
-> Catatan: HF Spaces *pause* setelah 48h tanpa aktivitas; Appwrite Cloud juga pause setelah ~1 minggu idle. Untuk keep warm, set cron terjadwal `GET /api/health` (mis. GitHub Actions / UptimeRobot) setiap beberapa jam.
+ > Alur cepat via script: `bash deploy-hf.sh` (panduan langkah-langkah manual + env yang perlu di-set). Script lain tersedia: `deploy-cf.sh` (API → Workers) dan `deploy-web.sh` (Web → CF Pages).
+
+ > Catatan: HF Spaces *pause* setelah 48h tanpa aktivitas; Appwrite Cloud juga pause setelah ~1 minggu idle. Untuk keep warm, set cron terjadwal `GET /api/health` (mis. GitHub Actions / UptimeRobot) setiap beberapa jam.
 
 #### 6.2.2 Seed data di production (opsional)
 
@@ -243,7 +252,15 @@ Build `apps/web/dist` dengan `VITE_API_URL=https://<username>-flowdoro-api.hf.sp
 - [ ] `curl http://localhost:3000/api/health` (Elysia) → `{success:true,...}`
 - [ ] `curl http://localhost:8787/api/health` (CF Workers local) → `{success:true,...}`
 - [ ] E2E `curl`: register → login → `GET /api/me` → create task → create session → patch completed → analytics summary
-- [ ] `.env.hf.api` sudah berisi `APPWRITE_*`; `APPWRITE_API_KEY` = **Secret** di Space
+ - [ ] `.env.hf.api` sudah berisi `APPWRITE_*`; `APPWRITE_API_KEY` = **Secret** di Space (lihat juga `.env.hf`, `.env.hf.web`)
 - [ ] Workers dashboard: `APPWRITE_API_KEY` = **Secret**, `CORS_ORIGIN` + `APPWRITE_*` = **Variables**
 
-> Env HF diringkas di **Space → Settings → Variables and secrets**. Variabel **wajib Secret**: `APPWRITE_API_KEY`. File `render.yaml.deprecated` disimpan untuk referensi migrasi balik ke Render jika butuh. Fly config (`fly.toml`, `deploy-fly.sh`) sudah dihapus — migrasi penuh ke Cloudflare Workers.
+ > Env HF diringkas di **Space → Settings → Variables and secrets**. Variabel **wajib Secret**: `APPWRITE_API_KEY`. File `render.yaml.deprecated` disimpan untuk referensi migrasi balik ke Render jika butuh. Fly config (`fly.toml`, `deploy-fly.sh`) sudah dihapus — migrasi penuh ke Cloudflare Workers.
+
+## Ringkasan Script Deploy
+
+| Script | Tujuan |
+|---|---|
+| `bun run deploy:cf` / `bash deploy-cf.sh` | API → Cloudflare Workers |
+| `bash deploy-web.sh` | Web → CF Pages (build dengan URL hardcoded Workers API) |
+| `bash deploy-hf.sh` | Panduan HF Spaces Docker setup |

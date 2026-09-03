@@ -45,6 +45,7 @@ async function seed() {
     const t = await databases.createDocument(appwrite.databaseId, appwrite.collections.tasks, ID.unique(), {
       userId,
       name,
+      starred: i === 0,
       createdAt: new Date().toISOString(),
     }).catch((e) => {
       console.log('  task maybe exists', e?.message)

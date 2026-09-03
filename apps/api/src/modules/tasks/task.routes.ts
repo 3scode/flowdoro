@@ -12,6 +12,7 @@ type TaskBody = {
   parentId?: string | null
   sortOrder?: number
   listId?: string | null
+  starred?: boolean
 }
 
 function serialize(doc: any): any {
@@ -30,6 +31,7 @@ function serialize(doc: any): any {
     completedAt: doc.completedAt ?? null,
     googleEventId: doc.googleEventId ?? null,
     listId: doc.listId ?? null,
+    starred: !!doc.starred,
     createdAt: doc.createdAt ?? new Date().toISOString(),
     updatedAt: doc.updatedAt ?? new Date().toISOString(),
   }
@@ -55,13 +57,12 @@ export const taskRoutes = new Elysia({ prefix: '/api/tasks' })
     else filters.push(Query.isNull('listId'))
     filters.push(Query.orderAsc('sortOrder'), Query.orderDesc('createdAt'))
     const res = await databases.listDocuments(appwrite.databaseId, appwrite.collections.tasks, filters)
-    // Client-side status filter (status derived from completedAt)
+    // Client-side filters
     const qStatus = query?.status as string | undefined
-    const tasks = qStatus === 'done'
-      ? res.documents.filter((d: any) => d.completedAt)
-      : qStatus === 'pending'
-      ? res.documents.filter((d: any) => !d.completedAt)
-      : res.documents
+    const qStarred = query?.starred === 'true'
+    const tasks = res.documents
+      .filter((d: any) => qStarred ? !!d.starred : true)
+      .filter((d: any) => qStatus === 'done' ? !!d.completedAt : qStatus === 'pending' ? !d.completedAt : true)
     return { success: true, data: tasks.map(serialize), error: null, meta: null }
   })
   .post('/', async ({ body, user, set }: any) => {
@@ -84,10 +85,11 @@ export const taskRoutes = new Elysia({ prefix: '/api/tasks' })
       listId: b.listId ?? null,
       completedAt: null,
       googleEventId: null,
+      starred: b.starred ?? false,
     })
     fireAndForget(calendar.syncTaskToCalendar({ ...doc, userId: user.id }))
     return { success: true, data: serialize(doc), error: null, meta: null }
-  }, { body: t.Object({ title: t.String(), description: t.Optional(t.Union([t.String(), t.Null()])), dueDate: t.Optional(t.Union([t.String(), t.Null()])), dueTime: t.Optional(t.Union([t.String(), t.Null()])), priority: t.Optional(t.Number()), parentId: t.Optional(t.Union([t.String(), t.Null()])), sortOrder: t.Optional(t.Number()), listId: t.Optional(t.Union([t.String(), t.Null()])) }) })
+  }, { body: t.Object({ title: t.String(), description: t.Optional(t.Union([t.String(), t.Null()])), dueDate: t.Optional(t.Union([t.String(), t.Null()])), dueTime: t.Optional(t.Union([t.String(), t.Null()])), priority: t.Optional(t.Number()), parentId: t.Optional(t.Union([t.String(), t.Null()])), sortOrder: t.Optional(t.Number()), listId: t.Optional(t.Union([t.String(), t.Null()])), starred: t.Optional(t.Boolean()) }) })
   .patch('/:id', async ({ params, user, body, set }: any) => {
     const databases = getDatabases()
     const taskId = (params as any).id
@@ -110,13 +112,31 @@ export const taskRoutes = new Elysia({ prefix: '/api/tasks' })
     if (b.parentId !== undefined) updates.parentId = b.parentId
     if (b.sortOrder !== undefined) updates.sortOrder = b.sortOrder
     if (b.listId !== undefined) updates.listId = b.listId
+    if (b.starred !== undefined) updates.starred = b.starred
     if (b.status !== undefined) updates.status = b.status
     if (b.completedAt !== undefined) updates.completedAt = b.completedAt
     await databases.updateDocument(appwrite.databaseId, appwrite.collections.tasks, taskId, updates)
     const updated = await databases.getDocument(appwrite.databaseId, appwrite.collections.tasks, taskId)
     fireAndForget(updated.status === 'done' ? calendar.deleteTaskFromCalendar(updated) : calendar.syncTaskToCalendar(updated))
     return { success: true, data: serialize(updated), error: null, meta: null }
-  }, { body: t.Object({ title: t.Optional(t.String()), description: t.Optional(t.Union([t.String(), t.Null()])), dueDate: t.Optional(t.Union([t.String(), t.Null()])), dueTime: t.Optional(t.Union([t.String(), t.Null()])), priority: t.Optional(t.Number()), parentId: t.Optional(t.Union([t.String(), t.Null()])), sortOrder: t.Optional(t.Number()), listId: t.Optional(t.Union([t.String(), t.Null()])), status: t.Optional(t.String()), completedAt: t.Optional(t.String()) }) })
+  }, { body: t.Object({ title: t.Optional(t.String()), description: t.Optional(t.Union([t.String(), t.Null()])), dueDate: t.Optional(t.Union([t.String(), t.Null()])), dueTime: t.Optional(t.Union([t.String(), t.Null()])), priority: t.Optional(t.Number()), parentId: t.Optional(t.Union([t.String(), t.Null()])), sortOrder: t.Optional(t.Number()), listId: t.Optional(t.Union([t.String(), t.Null()])), starred: t.Optional(t.Boolean()), status: t.Optional(t.String()), completedAt: t.Optional(t.String()) }) })
+  .post('/:id/star', async ({ params, user, set }: any) => {
+    const databases = getDatabases()
+    const taskId = (params as any).id
+    let doc
+    try { doc = await databases.getDocument(appwrite.databaseId, appwrite.collections.tasks, taskId) } catch {
+      set.status = 404
+      return { success: false, data: null, error: { code: 'NOT_FOUND', message: 'Task not found' }, meta: null }
+    }
+    if (doc.userId !== user.id) {
+      set.status = 404
+      return { success: false, data: null, error: { code: 'NOT_FOUND', message: 'Task not found' }, meta: null }
+    }
+    const updates: Record<string, any> = { starred: !doc.starred }
+    await databases.updateDocument(appwrite.databaseId, appwrite.collections.tasks, taskId, updates)
+    const updated = await databases.getDocument(appwrite.databaseId, appwrite.collections.tasks, taskId)
+    return { success: true, data: serialize(updated), error: null, meta: null }
+  })
   .put('/reorder', async ({ body, user, set }: any) => {
     const databases = getDatabases()
     const tasks = (body as { tasks: Array<{ id: string; sortOrder: number }> }).tasks
