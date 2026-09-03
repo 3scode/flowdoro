@@ -1,52 +1,66 @@
 import { Elysia } from 'elysia'
-import { eq, and, gte, sql } from 'drizzle-orm'
-import { db } from '../../db'
-import { sessions } from '../../db/schema'
-import { verifyToken } from '../../middleware/auth'
+import { getDatabases, appwrite, Query } from '../../lib/appwrite'
 
-async function getUser(headers: any, cookie: any) {
-  const token = cookie?.token?.value ?? headers['authorization']?.replace('Bearer ', '')
-  if (!token) throw new Error('UNAUTHORIZED')
-  return await verifyToken(token)
-}
-
-function streakDays(list: { startedAt: Date }[]) {
-  const dates = new Set(list.map((s) => s.startedAt.toISOString().slice(0, 10)))
+function streakDays(list: { startedAt: string }[]) {
+  const dates = new Set(list.map((s) => new Date(s.startedAt).toISOString().slice(0, 10)))
   let streak = 0
   const cur = new Date()
   while (dates.has(cur.toISOString().slice(0, 10))) { streak++; cur.setDate(cur.getDate() - 1) }
   return streak
 }
 
+async function listAllCompleted(userId: string): Promise<any[]> {
+  const databases = getDatabases()
+  const all: any[] = []
+  let cursor = 0
+  const limit = 100
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const res = await databases.listDocuments(appwrite.databaseId, appwrite.collections.sessions, [Query.equal('userId', userId), Query.equal('status', 'completed'), Query.limit(limit), Query.offset(cursor)], undefined, true)
+    all.push(...res.documents)
+    if (cursor + limit >= res.total) break
+    cursor += limit
+  }
+  return all
+}
+
 export const analyticsRoutes = new Elysia({ prefix: '/api/analytics' })
-  .get('/summary', async ({ headers, cookie, set, query }) => {
-    try {
-      const user = await getUser(headers as any, cookie)
-      const all = await db.select().from(sessions).where(and(eq(sessions.userId, user.id), eq(sessions.status, 'completed')))
-      const todayStr = new Date().toISOString().slice(0, 10)
-      const todaySessions = all.filter((s) => s.startedAt.toISOString().slice(0, 10) === todayStr)
-      const todayFocus = todaySessions.reduce((a, s) => a + s.durationSeconds, 0)
-      const totalFocus = all.reduce((a, s) => a + s.durationSeconds, 0)
-      const avgFocus = all.length ? Math.round(totalFocus / all.length) : 0
-      const longest = all.length ? Math.max(...all.map((s) => s.durationSeconds)) : 0
-      // best day
-      const byDay: Record<string, number> = {}
-      for (const s of all) { const d = s.startedAt.toISOString().slice(0, 10); byDay[d] = (byDay[d] ?? 0) + s.durationSeconds }
-      let bestDay: any = null
-      for (const [d, v] of Object.entries(byDay)) if (!bestDay || v > bestDay.value) bestDay = { date: d, value: v }
-      return { success: true, data: { todayFocus, totalFocus, avgFocus, longestSession: longest, bestDay, streak: streakDays(all), totalSessions: all.length }, error: null, meta: null }
-    } catch (e: any) { if (e.message === 'UNAUTHORIZED') { set.status = 401; return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, meta: null } } throw e }
+  .get('/summary', async ({ user }: any) => {
+    const all = await listAllCompleted(user.id)
+    const todayStr = new Date().toISOString().slice(0, 10)
+    const todaySessions = all.filter((s) => new Date(s.startedAt).toISOString().slice(0, 10) === todayStr)
+    const todayFocus = todaySessions.reduce((a: number, s: any) => a + (s.durationSeconds ?? 0), 0)
+    const totalFocus = all.reduce((a: number, s: any) => a + (s.durationSeconds ?? 0), 0)
+    const avgFocus = all.length ? Math.round(totalFocus / all.length) : 0
+    const longest = all.length ? Math.max(...all.map((s: any) => s.durationSeconds ?? 0)) : 0
+    const byDay: Record<string, number> = {}
+    for (const s of all) { const d = new Date(s.startedAt).toISOString().slice(0, 10); byDay[d] = (byDay[d] ?? 0) + (s.durationSeconds ?? 0) }
+    let bestDay: any = null
+    for (const [d, v] of Object.entries(byDay)) if (!bestDay || (v as number) > bestDay.value) bestDay = { date: d, value: v }
+    return { success: true, data: { todayFocus, totalFocus, avgFocus, longestSession: longest, bestDay, streak: streakDays(all), totalSessions: all.length }, error: null, meta: null }
   })
-  .get('/history', async ({ headers, cookie, set, query }) => {
-    try {
-      const user = await getUser(headers as any, cookie)
-      const period = (query as any).period ?? 'week'
-      const days = period === 'month' ? 30 : period === 'week' ? 7 : 1
-      const from = new Date(); from.setDate(from.getDate() - days)
-      const list = await db.select().from(sessions).where(and(eq(sessions.userId, user.id), eq(sessions.status, 'completed'), gte(sessions.startedAt, from)))
-      const byDate: Record<string, number> = {}
-      for (const s of list) { const d = s.startedAt.toISOString().slice(0, 10); byDate[d] = (byDate[d] ?? 0) + s.durationSeconds }
-      const points = Object.entries(byDate).map(([date, seconds]) => ({ date, seconds })).sort((a, b) => a.date.localeCompare(b.date))
-      return { success: true, data: points, error: null, meta: null }
-    } catch (e: any) { if (e.message === 'UNAUTHORIZED') { set.status = 401; return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, meta: null } } throw e }
+  .get('/history', async ({ user, query }: any) => {
+    const period = (query as any).period ?? 'week'
+    const days = period === 'month' ? 30 : period === 'week' ? 7 : 1
+    const from = new Date(); from.setDate(from.getDate() - days)
+    const all = await listAllCompleted(user.id)
+    const list = all.filter((s) => new Date(s.startedAt) >= from)
+    const byDate: Record<string, number> = {}
+    for (const s of list) { const d = new Date(s.startedAt).toISOString().slice(0, 10); byDate[d] = (byDate[d] ?? 0) + (s.durationSeconds ?? 0) }
+    const points = Object.entries(byDate).map(([date, seconds]) => ({ date, seconds })).sort((a, b) => a.date.localeCompare(b.date))
+    return { success: true, data: points, error: null, meta: null }
+  })
+  .get('/tasks', async ({ user }: any) => {
+    // Return time-spent breakdown per taskId: { totalFocusSeconds, sessionCount, restEarnedSeconds }
+    const all = await listAllCompleted(user.id)
+    const byTask: Record<string, { totalFocusSeconds: number; sessionCount: number; restEarnedSeconds: number }> = {}
+    for (const s of all) {
+      const tid = s.taskId
+      if (!tid) continue
+      if (!byTask[tid]) byTask[tid] = { totalFocusSeconds: 0, sessionCount: 0, restEarnedSeconds: 0 }
+      byTask[tid].totalFocusSeconds += s.durationSeconds ?? 0
+      byTask[tid].sessionCount += 1
+      byTask[tid].restEarnedSeconds += s.restEarnedSeconds ?? 0
+    }
+    return { success: true, data: byTask, error: null, meta: null }
   })

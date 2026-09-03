@@ -1,12 +1,16 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
+import { Account } from 'node-appwrite'
 import { env } from './config/env'
+import { getSessionClient, getProfile, appwrite } from './lib/appwrite'
 import { healthRoutes } from './modules/health/health.routes'
 import { authRoutes } from './modules/auth/auth.routes'
 import { sessionRoutes } from './modules/session/session.routes'
 import { analyticsRoutes } from './modules/analytics/analytics.routes'
 import { profileRoutes } from './modules/profile/profile.routes'
 import { taskRoutes } from './modules/tasks/task.routes'
+import { listRoutes } from './modules/lists/list.routes'
+import { googleRoutes } from './modules/google/google.routes'
 
 export const app = new Elysia()
   .use(
@@ -17,8 +21,32 @@ export const app = new Elysia()
       methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     }),
   )
+  .derive(async ({ cookie, headers, set, path }) => {
+    if (path.startsWith('/api/auth/') || path.startsWith('/api/health')) {
+      return { user: null }
+    }
+    const secret = (cookie as any)?.token?.value ?? headers['authorization']?.replace('Bearer ', '') ?? ''
+    if (!secret) {
+      set.status = 401
+      throw new Error('UNAUTHORIZED')
+    }
+    try {
+      const account = new Account(getSessionClient(secret))
+      const session = await account.get()
+      let profile: any = null
+      try {
+        profile = await getProfile(session.$id)
+      } catch {
+        profile = null
+      }
+      return { user: { id: session.$id, email: session.email, name: session.name, profile } }
+    } catch {
+      set.status = 401
+      throw new Error('UNAUTHORIZED')
+    }
+  })
   .onError(({ code, error, set }) => {
-    const msg = error?.message ?? ''
+    const msg = (error as any)?.message ?? ''
     if (msg === 'UNAUTHORIZED') {
       set.status = 401
       return { success: false, data: null, error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, meta: null }
@@ -41,3 +69,5 @@ export const app = new Elysia()
   .use(analyticsRoutes)
   .use(profileRoutes)
   .use(taskRoutes)
+  .use(listRoutes)
+  .use(googleRoutes)
