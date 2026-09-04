@@ -1,7 +1,8 @@
 import { Hono } from 'hono'
 import { ID } from 'appwrite'
-import { dbList, dbGet, dbCreate, dbUpdate, dbDelete } from '../lib/appwrite'
+import { dbList, dbListAll, dbGet, dbCreate, dbUpdate, dbDelete } from '../lib/appwrite'
 import { authMiddleware } from '../middleware/auth'
+import * as calendar from '../lib/calendar'
 
 type User = { id: string; email: string; name: string }
 type Env = { Bindings: any; Variables: { user: User; env: any } }
@@ -18,16 +19,17 @@ tasks.get('/', async (c) => {
   const starred = url.searchParams.get('starred') === 'true'
   let r: any
   if (parentId) {
-    // get subtasks of given parent
-    r = await dbList(e, e.appwriteCollectionTasks, [['userId', userId], ['parentId', parentId]])
+    // get subtasks of given parent — use dbListAll to handle >25 subtasks
+    r = await dbListAll(e, e.appwriteCollectionTasks, [['userId', userId], ['parentId', parentId]])
+    if (starred) r.documents = r.documents.filter((d: any) => d.starred)
   } else if (listId) {
-    // get tasks with exact listId match (filter manually for null listId)
-    const all = await dbList(e, e.appwriteCollectionTasks, [['userId', userId]])
-    const docs = all.documents.filter((d: any) => d.listId === listId && !d.parentId)
+    // get tasks with exact listId match (use dbListAll + server-side listId filter, client-side top-level filter)
+    const all = await dbListAll(e, e.appwriteCollectionTasks, [['userId', userId], ['listId', listId]])
+    const docs = all.documents.filter((d: any) => !d.parentId)
     return c.json({ success: true, data: docs, error: null, meta: null })
   } else {
-    // top-level tasks only (no parentId), optionally filter by listId='none'
-    r = await dbList(e, e.appwriteCollectionTasks, [['userId', userId]])
+    // top-level tasks only (no parentId), optionally filter by status/starred
+    r = await dbListAll(e, e.appwriteCollectionTasks, [['userId', userId]])
     const docs = r.documents.filter((d: any) => !d.parentId)
     if (status === 'done') {
       r.documents = docs.filter((d: any) => d.completedAt)
@@ -51,7 +53,7 @@ tasks.get('/', async (c) => {
 tasks.post('/', async (c) => {
   const e = c.get('env')
   const body: any = await c.req.json().catch(() => ({}))
-  const { name, title, description, dueDate, dueTime, priority, parentId, listId }: any = body
+  const { name, title, description, dueDate, dueTime, parentId, listId }: any = body
   if ((!title || title.length < 1) && (!name || name.length < 1)) {
     return c.json({ success: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'Task title required' }, meta: null }, 422)
   }
@@ -59,10 +61,12 @@ tasks.post('/', async (c) => {
     userId: c.get('user').id,
     name: title || name,
     title: title || name,
-    description, dueDate, dueTime, priority: priority ?? 0,
+    description, dueDate, dueTime,
     parentId, listId: listId ?? null,
     sortOrder: 0, completedAt: null, createdAt: new Date().toISOString(), starred: body.starred ?? false,
   })
+  // best-effort calendar sync (non-blocking, ignore errors)
+  try { await calendar.syncTaskToCalendar(e, doc) } catch {}
   return c.json({ success: true, data: doc, error: null, meta: null }, 201)
 })
 
@@ -80,7 +84,6 @@ tasks.patch('/:id', async (c) => {
   if (b.description !== undefined) updates.description = b.description
   if (b.dueDate !== undefined) updates.dueDate = b.dueDate
   if (b.dueTime !== undefined) updates.dueTime = b.dueTime
-  if (b.priority !== undefined) updates.priority = b.priority
   if (b.parentId !== undefined) updates.parentId = b.parentId
   if (b.listId !== undefined) updates.listId = b.listId ?? null
   if (b.sortOrder !== undefined) updates.sortOrder = b.sortOrder
@@ -88,6 +91,7 @@ tasks.patch('/:id', async (c) => {
   if (b.completedAt !== undefined) updates.completedAt = b.completedAt
   if (b.starred !== undefined) updates.starred = b.starred
   const updated = await dbUpdate(e, e.appwriteCollectionTasks, c.req.param('id'), updates)
+  try { await calendar.syncTaskToCalendar(e, updated) } catch {}
   return c.json({ success: true, data: updated, error: null, meta: null })
 })
 
@@ -130,6 +134,10 @@ tasks.post('/:id/toggle', async (c) => {
   const isDone = !!doc.completedAt
   const updates = { completedAt: isDone ? null : new Date().toISOString() }
   const updated = await dbUpdate(e, e.appwriteCollectionTasks, c.req.param('id'), updates)
+  try {
+    if (updated.completedAt) await calendar.deleteTaskFromCalendar(e, updated)
+    else await calendar.syncTaskToCalendar(e, updated)
+  } catch {}
   return c.json({ success: true, data: updated, error: null, meta: null })
 })
 
@@ -138,9 +146,11 @@ tasks.delete('/:id', async (c) => {
   try {
     const doc: any = await dbGet(e, e.appwriteCollectionTasks, c.req.param('id'))
     if (doc.userId !== c.get('user').id) return c.json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'Task not found' }, meta: null }, 404)
-    // cascade delete subtasks
-    const children = await dbList(e, e.appwriteCollectionTasks, [['userId', c.get('user').id], ['parentId', doc.$id]])
+    try { await calendar.deleteTaskFromCalendar(e, doc) } catch {}
+    // cascade delete subtasks — use dbListAll for completeness
+    const children = await dbListAll(e, e.appwriteCollectionTasks, [['userId', c.get('user').id], ['parentId', doc.$id]])
     for (const child of children.documents) {
+      try { await calendar.deleteTaskFromCalendar(e, child) } catch {}
       await dbDelete(e, e.appwriteCollectionTasks, child.$id)
     }
     await dbDelete(e, e.appwriteCollectionTasks, c.req.param('id'))

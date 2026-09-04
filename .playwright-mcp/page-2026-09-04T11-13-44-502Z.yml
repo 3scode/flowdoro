@@ -1,0 +1,18 @@
+- generic [ref=f5e3]:
+  - heading "◉ Flowdoro" [level=1] [ref=f5e4]
+  - paragraph [ref=f5e5]: Set new password
+  - generic [ref=f5e6]:
+    - generic [ref=f5e7]:
+      - generic [ref=f5e8]: New Password
+      - textbox "New Password" [ref=f5e9]:
+        - /placeholder: ••••••••
+    - generic [ref=f5e10]:
+      - generic [ref=f5e11]: Confirm New Password
+      - textbox "Confirm New Password" [ref=f5e12]:
+        - /placeholder: ••••••••
+    - paragraph [ref=f5e13]: Min 8 characters. This will invalidate the reset link after use.
+    - button "Reset password" [disabled] [ref=f5e14]
+    - generic [ref=f5e15]:
+      - button "Request new link" [ref=f5e16]
+      - generic [ref=f5e17]: ·
+      - button "Back to Log In" [ref=f5e18]

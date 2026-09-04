@@ -1,0 +1,46 @@
+- generic [ref=f3e2]:
+  - generic [ref=f3e3]:
+    - navigation "Main navigation" [ref=f3e4]:
+      - generic [ref=f3e5]: Flowdoro
+      - button "Dashboard" [ref=f3e7]
+      - button "Focus" [ref=f3e9]
+      - button "Tasks" [ref=f3e11]
+      - button "History" [ref=f3e13]
+      - button "Analytics" [ref=f3e15]
+      - button "Settings" [ref=f3e17]
+    - generic [ref=f3e19]:
+      - banner [ref=f3e20]:
+        - generic [ref=f3e21]: ◉ Flowdoro
+        - generic [ref=f3e22]:
+          - button "E2E Web" [ref=f3e44]
+          - button "Logout" [ref=f3e45]
+      - main [ref=f3e24]:
+        - generic [ref=f3e25]:
+          - heading "Settings" [level=1] [ref=f3e26]
+          - generic [ref=f3e27]:
+            - heading "Profile" [level=2] [ref=f3e28]
+            - paragraph [ref=f3e29]: "Name: E2E Web"
+            - paragraph [ref=f3e30]: "Email: e2eweb_1788473000@flowdoro.app"
+          - generic [ref=f3e31]:
+            - heading "Preferences" [level=2] [ref=f3e32]
+            - generic [ref=f3e33]:
+              - generic [ref=f3e34]: Rest Ratio
+              - combobox "Rest Ratio" [ref=f3e35]:
+                - option "1 / 3"
+                - option "1 / 4" [selected]
+                - option "1 / 5 (default)"
+                - option "1 / 6"
+            - paragraph [ref=f3e36]: "Example: 30 min focus → 7 min rest"
+            - generic [ref=f3e37]:
+              - generic [ref=f3e38]: Theme
+              - combobox "Theme" [ref=f3e39]:
+                - option "Light"
+                - option "Dark"
+                - option "System" [selected]
+            - button "Save" [ref=f3e40]
+          - generic [ref=f3e41]:
+            - heading "About" [level=2] [ref=f3e42]
+            - paragraph [ref=f3e43]: Flowdoro v1.0.0 — Proportional rest timer.
+  - status [ref=f3e47]:
+    - paragraph [ref=f3e50]: Saved!
+    - button "Dismiss" [ref=f3e51]

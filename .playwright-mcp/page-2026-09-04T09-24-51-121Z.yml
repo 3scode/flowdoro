@@ -1,0 +1,24 @@
+- generic [ref=f7e3]:
+  - navigation "Main navigation" [ref=f7e4]:
+    - generic [ref=f7e5]:
+      - button "Dashboard" [ref=f7e6]
+      - button "Focus" [ref=f7e9]
+      - button "Tasks" [ref=f7e12]
+      - button "History" [ref=f7e15]
+      - button "Analytics" [ref=f7e18]
+      - button "Settings" [ref=f7e22]
+  - generic [ref=f7e25]:
+    - banner [ref=f7e26]:
+      - button "◉ Flowdoro" [ref=f7e27]
+      - button "Guest" [ref=f7e29]
+    - main [ref=f7e30]:
+      - generic [ref=f7e31]:
+        - generic [ref=f7e32]:
+          - heading "Analytics" [level=1] [ref=f7e33]
+          - group "Time period" [ref=f7e34]:
+            - button "day" [ref=f7e35]
+            - button "week" [pressed] [ref=f7e36]
+            - button "month" [ref=f7e37]
+        - generic [ref=f7e38]:
+          - paragraph [ref=f7e39]: Building your insights
+          - paragraph [ref=f7e40]: Complete a few more sessions.

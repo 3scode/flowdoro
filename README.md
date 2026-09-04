@@ -1,62 +1,50 @@
 # Flowdoro — Smart Time Management with Proportional Rest (5:1)
 
-Monorepo Bun: Svelte 5 + Vite 6 + Tailwind 4 (web) + Bun + Elysia 1.4 (api) + Hono 4 + Appwrite Web SDK (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage).
+Monorepo Bun: Svelte 5 + Vite 6 + Tailwind 4 (web) + Hono 4 + Appwrite Web SDK (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage).
 
-## Deploy Options
+## Deploy
 
-### Cloudflare Workers (Recommended — serverless, no CC)
-
-**API:** `apps/api-cloudflare/` — Hono 4 + Appwrite Web SDK. Deploy via `wrangler`. Domain: `<name>.workers.dev` atau custom domain.
+**API:** `apps/api-cloudflare/` — Hono 4 + Appwrite REST via `fetch`. Deploy via `wrangler deploy`.
 
 ```bash
 bun install
-cp .env.example .env                  # isi APPWRITE_* di .env (untuk local dev)
-bun run dev:api:cf                     # :8787 via wrangler
-bun run deploy:api:cf                  # deploy ke Cloudflare
+cp .env.example .env                  # isi APPWRITE_* di .env (untuk seed + local dev)
+cp .env .dev.vars                     # wrangler dev baca .dev.vars
+bun run dev:api                        # :8787 via wrangler (apps/api-cloudflare)
+bun run dev:web                        # :5173 vite (proxy /api → :8787)
 ```
 
-ENV vars di `wrangler.toml` → `cloudflare.toml` saat deploy, atau set via Dashboard → Workers → Variables.
+**Web:** Cloudflare Pages (`apps/web/dist`) — build `VITE_API_URL=https://api.flowdoro.3scode.my.id bun run --cwd apps/web build` lalu `wrangler pages deploy apps/web/dist` (atau `bash deploy-web.sh`). Local `VITE_API_URL=http://localhost:8787` (via `vite.config.ts` proxy `/api` → `:8787`).
 
-**Web:** Cloudflare Pages (`apps/web/dist`) — build `bun run --cwd apps/web build` dengan `VITE_API_URL=https://flowdoro-api.email-trisno-sanjaya.workers.dev`.
+Atau pakai script: `bash deploy-cf.sh` (API) + `bash deploy-web.sh` (Web).
 
----
+**DB/Auth/Storage:** Appwrite Cloud (https://cloud.appwrite.io) — Auth = Appwrite Users, DB = database `flowdoro` (collections `profiles`/`tasks`/`sessions`/`session_events`/`lists`), Storage = bucket `avatars`.
 
-### Hugging Face Spaces (Fallback — Docker)
-
-> Render free sekarang minta CC. Flowdoro sudah migrasi ke **Hugging Face Spaces Docker** (port `7860`, no CC). Lihat `render.yaml.deprecated` untuk arsip Render.
-
-**API:** `https://huggingface.co/spaces/<username>/flowdoro-api` — SDK `docker`, `app_port: 7860`, `Dockerfile` di root (`Dockerfile` `EXPOSE 7860`), listen `0.0.0.0:${PORT}` di `apps/api/src/index.ts`.
-
-**DB/Auth/Storage:** Appwrite Cloud (https://cloud.appwrite.io) — free no CC. Auth = Appwrite Users, DB = database `flowdoro` (collections `profiles`/`tasks`/`sessions`/`session_events`), Storage = bucket `avatars`. Set `APPWRITE_*` di Space (lihat `env.md` §2-3).
-
-**Web:** HF Spaces Static (`apps/web/dist`) **atau** Cloudflare Pages / Netlify / Vercel (semuanya no CC) — build `bun run --cwd apps/web build` dengan `VITE_API_URL=https://flowdoro-api.email-trisno-sanjaya.workers.dev`.
-
-Panduan lengkap: `TEST-RUN-BUILD.md` §5.3 + `env.md` §2-4 + `AGENTS.md`.
+Panduan lengkap: `env.md` + `AGENTS.md`.
 
 ## Quick Start (Local)
 
 ```bash
 bun install
 cp .env.example .env              # isi APPWRITE_PROJECT_ID + APPWRITE_API_KEY
-bun run --cwd apps/api seed:dev   # demo user + task + session (butuh Appwrite setup dulu)
-bun run dev:api   # :3000
-bun run dev:web   # :5173 (proxy /api → :3000)
+cp .env .dev.vars                 # untuk wrangler dev
+bun run seed:dev                  # demo user + task + session (scripts/seed.mjs)
+bun run dev:api   # :8787 (wrangler)
+bun run dev:web   # :5173 (proxy /api → :8787)
 ```
 
 Verifikasi:
 ```bash
 bun run --cwd apps/web build
-curl http://localhost:3000/api/health
+curl http://localhost:8787/api/health
 ```
 
-## HF Spaces ENV (Wajib)
+## Workers ENV (Wajib)
 
-Space API → **Settings → Variables and secrets**:
+Cloudflare Dashboard → **Workers → flowdoro-api → Settings → Variables**:
 
-- Variables: `NODE_ENV=production`, `PORT=7860`, `APPWRITE_ENDPOINT`, `APPWRITE_PROJECT_ID`, `APPWRITE_DATABASE_ID`, `APPWRITE_COLLECTION_*`, `APPWRITE_BUCKET_AVATARS`, `CORS_ORIGIN=https://<web-url>`
-- Secrets: `APPWRITE_API_KEY` (**Server API key** — wajib Secret, bukan Variable)
-
-Lihat template siap pakai: `.env.hf.api`, `.env.hf.web`, `.env.hf` (combined).
+- Variables: `CORS_ORIGIN=https://flowdoro.3scode.my.id`, `APP_URL=https://flowdoro.3scode.my.id`, `BETTER_AUTH_URL=https://api.flowdoro.3scode.my.id`, `GOOGLE_CLIENT_ID`, `GOOGLE_REDIRECT_URI=https://api.flowdoro.3scode.my.id/api/google/callback`, `APPWRITE_*`
+- Secrets (encrypted): `APPWRITE_API_KEY`, `BETTER_AUTH_SECRET` (64-hex), `GOOGLE_CLIENT_SECRET`, `GOOGLE_TOKEN_ENCRYPTION_KEY` → `wrangler secret put <NAME>` atau Dashboard → Secrets — lihat `env.md` §1
 
 ## Docs
 

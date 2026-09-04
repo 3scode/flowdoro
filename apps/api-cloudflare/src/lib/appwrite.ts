@@ -9,7 +9,13 @@ export type EnvVars = {
   appwriteCollectionTasks: string
   appwriteCollectionSessions: string
   appwriteCollectionEvents: string
+  appwriteCollectionLists: string
+  appwriteCollectionGoogleTokens: string
   appwriteBucketAvatars: string
+  googleClientId: string
+  googleClientSecret: string
+  googleRedirectUri: string
+  googleTokenEncryptionKey: string
 }
 
 const HEADERS = (e: EnvVars) => ({
@@ -19,20 +25,36 @@ const HEADERS = (e: EnvVars) => ({
 })
 const BASE = (e: EnvVars) => `${e.appwriteEndpoint}/databases/${e.appwriteDatabaseId}`
 
-// Build queries array as JSON strings (Appwrite REST API format)
-function buildQueries(queries: [string, string | number, string?][]) {
-  return queries.map(([attr, val, type = 'string'], i) => {
-    const method = type === 'number' ? 'equal' : 'equal'
-    const json = JSON.stringify({ method, attribute: attr, values: [String(val)] })
-    return `queries[${i}]=${encodeURIComponent(json)}`
-  }).join('&')
+// Build queries array as JSON strings (Appwrite REST API format) — use queries[] for all including limit/offset (Appwrite v1.5+)
+function buildQueries(queries: [string, string | number, string?][], limit: number, offset: number) {
+  const all: string[] = []
+  queries.forEach(([attr, val]) => {
+    all.push(JSON.stringify({ method: 'equal', attribute: attr, values: [String(val)] }))
+  })
+  all.push(JSON.stringify({ method: 'limit', values: [limit] }))
+  all.push(JSON.stringify({ method: 'offset', values: [offset] }))
+  return all.map((json) => `queries[]=${encodeURIComponent(json)}`).join('&')
 }
 
-export async function dbList(e: EnvVars, collection: string, queries: [string, string | number][] = [], limit = 100, offset = 0) {
-  const qs = queries.length ? buildQueries(queries.map(([a, v]) => [a, v, 'string'] as [string, string | number, string])) : ''
-  const limitQs = `limit=${limit}&offset=${offset}`
-  const res = await fetch(`${BASE(e)}/collections/${collection}/documents${qs ? '?' + qs + '&' : '?'}${limitQs}`, { headers: HEADERS(e) })
+export async function dbList(e: EnvVars, collection: string, queries: [string, string | number][] = [], limit = 25, offset = 0) {
+  const qs = buildQueries(queries, limit, offset)
+  const res = await fetch(`${BASE(e)}/collections/${collection}/documents?${qs}`, { headers: HEADERS(e) })
   return res.json() as Promise<{ documents: any[]; total: number }>
+}
+
+export async function dbListAll(e: EnvVars, collection: string, queries: [string, string | number][] = [], limit = 25) {
+  let offset = 0
+  let all: any[] = []
+  let total = Infinity
+  while (all.length < total) {
+    const r = await dbList(e, collection, queries, limit, offset)
+    if (!r.documents || r.documents.length === 0) break
+    all.push(...r.documents)
+    total = r.total ?? all.length
+    if (all.length >= total) break
+    offset += r.documents.length
+  }
+  return { documents: all, total: all.length } as { documents: any[]; total: number }
 }
 
 export async function dbGet(e: EnvVars, collection: string, docId: string) {
@@ -52,8 +74,12 @@ export async function dbCreate(e: EnvVars, collection: string, data: any) {
 export async function dbUpdate(e: EnvVars, collection: string, docId: string, data: any) {
   const res = await fetch(`${BASE(e)}/collections/${collection}/documents/${docId}`, {
     method: 'PATCH', headers: HEADERS(e),
-    body: JSON.stringify(data),
+    body: JSON.stringify({ data }),
   })
+  if (!res.ok) {
+    const err: any = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(err?.message ?? 'update failed'), { status: res.status, detail: err })
+  }
   return res.json() as Promise<any>
 }
 

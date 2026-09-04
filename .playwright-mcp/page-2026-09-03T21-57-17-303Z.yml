@@ -1,0 +1,16 @@
+- generic [ref=e26]:
+  - heading "◉ Flowdoro" [level=1] [ref=e27]
+  - paragraph [ref=e28]: Welcome back
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]: Email
+      - textbox "Email" [ref=e32]:
+        - /placeholder: you@example.com
+    - generic [ref=e33]:
+      - generic [ref=e34]: Password
+      - textbox "Password" [ref=e35]:
+        - /placeholder: ••••••••
+    - button "Log In" [ref=e36]
+    - paragraph [ref=e37]:
+      - text: Don't have an account?
+      - button "Sign Up" [ref=e38]

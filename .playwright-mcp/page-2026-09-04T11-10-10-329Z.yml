@@ -1,0 +1,14 @@
+- generic [ref=f2e151]:
+  - heading "◉ Flowdoro" [level=1] [ref=f2e152]
+  - paragraph [ref=f2e153]: Reset your password
+  - generic [ref=f2e154]:
+    - paragraph [ref=f2e155]: Enter your email and we'll send you a link to reset your password.
+    - generic [ref=f2e156]:
+      - generic [ref=f2e157]: Email
+      - textbox "Email" [ref=f2e158]:
+        - /placeholder: you@example.com
+    - button "Send reset link" [disabled] [ref=f2e159]
+    - generic [ref=f2e160]:
+      - button "Back to Log In" [ref=f2e161]
+      - generic [ref=f2e162]: ·
+      - button "Create account" [ref=f2e163]

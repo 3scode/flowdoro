@@ -1,0 +1,17 @@
+- generic [ref=f2e199]:
+  - navigation "Main navigation" [ref=f2e200]:
+    - generic [ref=f2e201]: Flowdoro
+    - button "Dashboard" [ref=f2e203]
+    - button "Focus" [ref=f2e205]
+    - button "Tasks" [ref=f2e207]
+    - button "History" [ref=f2e209]
+    - button "Analytics" [ref=f2e211]
+    - button "Settings" [ref=f2e213]
+  - generic [ref=f2e215]:
+    - banner [ref=f2e216]:
+      - button "◉ Flowdoro" [ref=f2e217]
+      - generic [ref=f2e218]:
+        - button "E2E Test" [ref=f2e219]
+        - button "Logout" [ref=f2e220]
+    - main [ref=f2e221]:
+      - heading "Dashboard" [level=1] [ref=f2e223]

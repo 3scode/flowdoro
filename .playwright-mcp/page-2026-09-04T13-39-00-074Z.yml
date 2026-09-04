@@ -1,0 +1,30 @@
+- generic [ref=f14e2]:
+  - generic [ref=f14e3]:
+    - heading "◉ Flowdoro" [level=1] [ref=f14e4]
+    - paragraph [ref=f14e5]: Welcome back
+    - generic [ref=f14e6]:
+      - generic [ref=f14e7]: The user denied your request
+      - generic [ref=f14e8]:
+        - generic [ref=f14e9]: Email
+        - textbox "Email" [ref=f14e10]:
+          - /placeholder: you@example.com
+      - generic [ref=f14e11]:
+        - generic [ref=f14e12]:
+          - generic [ref=f14e13]: Password
+          - button "Password" [ref=f14e14]: Forgot password?
+        - textbox "••••••••" [ref=f14e15]
+      - button "Log In" [ref=f14e16]
+      - generic [ref=f14e17]: or continue with
+      - generic [ref=f14e21]:
+        - button "Google" [ref=f14e22]
+        - button "GitHub" [ref=f14e24]
+      - paragraph [ref=f14e26]:
+        - text: Don't have an account?
+        - button "Sign Up" [ref=f14e27]
+  - generic:
+    - status [ref=f14e29]:
+      - paragraph [ref=f14e32]: The user denied your request
+      - button "Dismiss" [ref=f14e33]
+    - status [ref=f14e36]:
+      - paragraph [ref=f14e39]: The user denied your request
+      - button "Dismiss" [ref=f14e40]

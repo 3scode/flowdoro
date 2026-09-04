@@ -1,0 +1,23 @@
+- generic [ref=f3e3]:
+  - heading "◉ Flowdoro" [level=1] [ref=f3e4]
+  - paragraph [ref=f3e5]: Welcome back
+  - generic [ref=f3e6]:
+    - generic [ref=f3e27]: Failed to fetch
+    - generic [ref=f3e7]:
+      - generic [ref=f3e8]: Email
+      - textbox "Email" [ref=f3e9]:
+        - /placeholder: you@example.com
+        - text: e2e-test-1756983233@example.com
+    - generic [ref=f3e10]:
+      - generic [ref=f3e11]:
+        - generic [ref=f3e12]: Password
+        - button "Password Test12345!" [ref=f3e28]: Forgot password?
+      - textbox "••••••••" [ref=f3e14]: Test12345!
+    - button "Log In" [ref=f3e15]
+    - generic [ref=f3e16]: or continue with
+    - generic [ref=f3e20]:
+      - button "Google" [ref=f3e21]
+      - button "GitHub" [ref=f3e23]
+    - paragraph [ref=f3e25]:
+      - text: Don't have an account?
+      - button "Sign Up" [ref=f3e26]

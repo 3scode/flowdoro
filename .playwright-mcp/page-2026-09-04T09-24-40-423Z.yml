@@ -1,0 +1,26 @@
+- generic [ref=f6e3]:
+  - navigation "Main navigation" [ref=f6e4]:
+    - generic [ref=f6e5]:
+      - button "Dashboard" [ref=f6e6]
+      - button "Focus" [ref=f6e9]
+      - button "Tasks" [ref=f6e12]
+      - button "History" [ref=f6e15]
+      - button "Analytics" [ref=f6e19]
+      - button "Settings" [ref=f6e22]
+  - generic [ref=f6e25]:
+    - banner [ref=f6e26]:
+      - button "◉ Flowdoro" [ref=f6e27]
+      - button "Guest" [ref=f6e29]
+    - main [ref=f6e30]:
+      - generic [ref=f6e31]:
+        - heading "History" [level=1] [ref=f6e32]
+        - generic [ref=f6e33]:
+          - generic [ref=f6e34]:
+            - textbox [ref=f6e35]
+            - textbox [ref=f6e36]
+          - generic [ref=f6e37]:
+            - button "Filter" [ref=f6e38]
+            - button "Clear" [ref=f6e39]
+        - generic [ref=f6e40]:
+          - paragraph [ref=f6e41]: No sessions yet
+          - paragraph [ref=f6e42]: Your history will appear here.

@@ -1,0 +1,51 @@
+- generic [ref=f7e3]:
+  - navigation "Main navigation" [ref=f7e4]:
+    - generic [ref=f7e5]: Flowdoro
+    - button "Dashboard" [ref=f7e7]
+    - button "Focus" [ref=f7e9]
+    - button "Tasks" [ref=f7e11]
+    - button "History" [ref=f7e13]
+    - button "Analytics" [ref=f7e15]
+    - button "Settings" [ref=f7e17]
+  - generic [ref=f7e19]:
+    - banner [ref=f7e20]:
+      - generic [ref=f7e21]: ◉ Flowdoro
+      - generic [ref=f7e22]:
+        - button "Demo User" [ref=f7e23]
+        - button "Logout" [ref=f7e24]
+    - main [ref=f7e25]:
+      - generic [ref=f7e26]:
+        - generic [ref=f7e27]:
+          - generic [ref=f7e28]:
+            - heading "Tasks" [level=1] [ref=f7e30]
+            - generic [ref=f7e31]: 1 pending
+            - generic [ref=f7e32]: ⭐ 1
+          - button "New Task" [ref=f7e33]
+        - generic [ref=f7e35]:
+          - complementary [ref=f7e36]:
+            - button "All Tasks" [ref=f7e37]
+            - button "⭐ Starred" [ref=f7e38]
+            - button "Today's Focus" [ref=f7e39]
+            - button "Scheduled" [ref=f7e40]
+            - button "Completed" [ref=f7e41]
+            - generic [ref=f7e42]:
+              - generic [ref=f7e43]: Lists
+              - button [ref=f7e44]
+            - generic [ref=f7e46] [cursor=pointer]:
+              - generic [ref=f7e48]: TestList_1788464022
+              - button [ref=f7e49]
+          - main [ref=f7e51]:
+            - generic [ref=f7e52]:
+              - textbox "Quick add in list…" [ref=f7e53]
+              - combobox "Assign to list" [ref=f7e54]:
+                - option "No list"
+                - option "TestList_1788464022" [selected]
+              - button "Add" [disabled] [ref=f7e55]
+            - listitem [ref=f7e57]:
+              - button "Tandai selesai" [ref=f7e58]
+              - paragraph [ref=f7e61]: Smoke Task
+              - generic [ref=f7e62]:
+                - button "Star" [ref=f7e63]
+                - button "Start focus" [ref=f7e65]
+                - button "Add subtask" [ref=f7e67]
+                - button "Delete" [ref=f7e69]

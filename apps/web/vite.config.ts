@@ -5,6 +5,8 @@ import path from 'path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  // Unify: Vite client uses VITE_API_URL, server proxy previously used API_URL — support both + BETTER_AUTH_URL fallback
+  const apiTarget = (env.VITE_API_URL || env.API_URL || env.BETTER_AUTH_URL || 'http://localhost:8787').replace(/\/$/, '')
   return {
     plugins: [tailwindcss(), svelte()],
     resolve: {
@@ -17,9 +19,9 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/api': {
-          target: env.API_URL ?? 'http://localhost:3000',
+          target: apiTarget,
           changeOrigin: true,
-          cookieDomainRewrite: { 'localhost:3000': '' },
+          cookieDomainRewrite: { 'localhost:8787': '' },
           cookiePathRewrite: { '/': '' },
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq, req) => {
@@ -30,7 +32,7 @@ export default defineConfig(({ mode }) => {
           },
         },
         '/health': {
-          target: env.API_URL ?? 'http://localhost:3000',
+          target: apiTarget,
           changeOrigin: true,
         },
       },

@@ -3,10 +3,15 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+[[d1_databases]]
+binding = "DB"
+database_name = "flowdoro-auth"
+database_id = "e0f8f3e4-1755-48fe-9758-25e476ee5504"
+
 [vars]
 NODE_ENV = "production"
-APP_URL = "https://flowdoro.email-trisno-sanjaya.pages.dev"
-CORS_ORIGIN = "https://flowdoro-web.pages.dev"
+APP_URL = "https://flowdoro.3scode.my.id"
+CORS_ORIGIN = "https://flowdoro.3scode.my.id"
 API_URL = ""
 REST_RATIO_DEFAULT = "5"
 LOG_LEVEL = "info"
@@ -18,5 +23,9 @@ APPWRITE_COLLECTION_TASKS = "tasks"
 APPWRITE_COLLECTION_SESSIONS = "sessions"
 APPWRITE_COLLECTION_EVENTS = "session_events"
 APPWRITE_COLLECTION_LISTS = "lists"
+APPWRITE_COLLECTION_GOOGLE_TOKENS = "google_tokens"
 APPWRITE_BUCKET_AVATARS = "avatars"
-APPWRITE_API_KEY = "standard_34e65988872a02b7a7cf688d7ac47e0434452975b58ba98bb1fe51b6883f01c3135409446ed7b71420bb038f8c41a06e39d5d8e4e6a5bc971322840f48bb0c8e941b8c60cb64af3ddd3d8cc681825cb0b93f5ec5e4ed732b940dea2f218aa4c95d26754d90676de224a95e4655e52c3c96d0680885cd7e0758cab77deba60c09"
+GOOGLE_CLIENT_ID = "your-google-client-id.apps.googleusercontent.com" # set real value via dashboard or wrangler vars — don't commit real ID
+GOOGLE_REDIRECT_URI = "https://api.flowdoro.3scode.my.id/api/google/callback"
+BETTER_AUTH_URL = "https://api.flowdoro.3scode.my.id"
+# BETTER_AUTH_SECRET, APPWRITE_API_KEY, GOOGLE_CLIENT_SECRET, GOOGLE_TOKEN_ENCRYPTION_KEY, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET must be set via `wrangler secret put` — never commit here

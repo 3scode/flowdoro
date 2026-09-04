@@ -1,0 +1,21 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e151]:
+    - heading "◉ Flowdoro" [level=1] [ref=f2e152]
+    - paragraph [ref=f2e153]: Reset your password
+    - generic [ref=f2e154]:
+      - generic [ref=f2e164]: If an account exists for e2e-test-1756983233@example.com, we sent a reset link. Check your inbox (and spam). Link valid 24h, once only.
+      - paragraph [ref=f2e155]: Enter your email and we'll send you a link to reset your password.
+      - generic [ref=f2e156]:
+        - generic [ref=f2e157]: Email
+        - textbox "Email" [ref=f2e158]:
+          - /placeholder: you@example.com
+          - text: e2e-test-1756983233@example.com
+      - button "Resend in 30s" [disabled] [ref=f2e165]
+      - paragraph [ref=f2e166]: Didn't get it? Check spam or wait 30s to resend.
+      - generic [ref=f2e160]:
+        - button "Back to Log In" [ref=f2e161]
+        - generic [ref=f2e162]: ·
+        - button "Create account" [ref=f2e163]
+  - status [ref=f2e168]:
+    - paragraph [ref=f2e171]: Check your email — reset link sent!
+    - button "Dismiss" [ref=f2e172]

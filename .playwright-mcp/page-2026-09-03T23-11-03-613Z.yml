@@ -1,0 +1,23 @@
+- generic [ref=e16]:
+  - navigation "Main navigation" [ref=e17]:
+    - generic [ref=e18]: Flowdoro
+    - button "Dashboard" [ref=e20]
+    - button "Focus" [ref=e22]
+    - button "Tasks" [ref=e24]
+    - button "History" [ref=e26]
+    - button "Analytics" [ref=e28]
+    - button "Settings" [ref=e30]
+  - generic [ref=e32]:
+    - banner [ref=e33]:
+      - generic [ref=e34]: ◉ Flowdoro
+      - generic [ref=e35]:
+        - button "TrisnoSanjaya" [ref=e36]
+        - button "Logout" [ref=e37]
+    - main [ref=e38]:
+      - generic [ref=e39]:
+        - heading "Dashboard" [level=1] [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]: ⏱
+          - heading "Ready to focus?" [level=3] [ref=e43]
+          - paragraph [ref=e44]: Start your first focus session. Work as long as you need.
+          - button "Start Focusing" [ref=e45]

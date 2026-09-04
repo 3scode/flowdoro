@@ -1,0 +1,156 @@
+- generic [ref=f1e3]:
+  - navigation "Main navigation" [ref=f1e4]:
+    - generic [ref=f1e5]: Flowdoro
+    - button "Dashboard" [ref=f1e7]
+    - button "Focus" [ref=f1e9]
+    - button "Tasks" [ref=f1e11]
+    - button "History" [ref=f1e13]
+    - button "Analytics" [ref=f1e15]
+    - button "Settings" [ref=f1e17]
+  - generic [ref=f1e19]:
+    - banner [ref=f1e20]:
+      - generic [ref=f1e21]: ◉ Flowdoro
+      - generic [ref=f1e22]:
+        - button "Demo User" [ref=f1e23]
+        - button "Logout" [ref=f1e24]
+    - main [ref=f1e25]:
+      - generic [ref=f1e26]:
+        - generic [ref=f1e27]:
+          - generic [ref=f1e28]:
+            - heading "Tasks" [level=1] [ref=f1e30]
+            - generic [ref=f1e31]: 8 pending
+            - generic [ref=f1e56]: ⭐ 2
+          - button "New Task" [ref=f1e32]
+        - generic [ref=f1e34]:
+          - complementary [ref=f1e35]:
+            - button "All Tasks" [ref=f1e36]
+            - button "⭐ Starred" [ref=f1e37]
+            - button "Today's Focus" [ref=f1e38]
+            - button "Scheduled" [ref=f1e39]
+            - button "Completed" [ref=f1e40]
+            - generic [ref=f1e41]:
+              - generic [ref=f1e42]: Lists
+              - button [ref=f1e43]
+            - generic [ref=f1e57] [cursor=pointer]:
+              - generic [ref=f1e59]: TestList_1788464022
+              - button [ref=f1e60]
+            - generic [ref=f1e62] [cursor=pointer]:
+              - generic [ref=f1e64]: MoveTestA_1788474613
+              - button [ref=f1e65]
+            - generic [ref=f1e67] [cursor=pointer]:
+              - generic [ref=f1e69]: MoveTestB_1788474613
+              - button [ref=f1e70]
+          - main [ref=f1e46]:
+            - generic [ref=f1e47]:
+              - textbox "Quick add task…" [ref=f1e48]
+              - combobox "Assign to list" [ref=f1e49]:
+                - option "No list"
+                - option "TestList_1788464022"
+                - option "MoveTestA_1788474613"
+                - option "MoveTestB_1788474613"
+              - button "Add" [disabled] [ref=f1e50]
+            - generic [ref=f1e72]:
+              - listitem [ref=f1e73]:
+                - button "Tandai selesai" [ref=f1e74]
+                - paragraph [ref=f1e77]: Smoke Task
+                - generic [ref=f1e78]:
+                  - combobox "Move to list" [ref=f1e79]:
+                    - option "No list"
+                    - option "TestList_1788464022" [selected]
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e80]
+                  - button "Start focus" [ref=f1e82]
+                  - button "Add subtask" [ref=f1e84]
+                  - button "Delete" [ref=f1e86]
+              - listitem [ref=f1e88]:
+                - button "Tandai selesai" [ref=f1e89]
+                - paragraph [ref=f1e92]: Deep Work
+                - generic [ref=f1e93]:
+                  - combobox "Move to list" [ref=f1e94]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e95]
+                  - button "Start focus" [ref=f1e97]
+                  - button "Add subtask" [ref=f1e99]
+                  - button "Delete" [ref=f1e101]
+              - listitem [ref=f1e103]:
+                - button "Tandai selesai" [ref=f1e104]
+                - paragraph [ref=f1e107]: Study
+                - generic [ref=f1e108]:
+                  - combobox "Move to list" [ref=f1e109]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e110]
+                  - button "Start focus" [ref=f1e112]
+                  - button "Add subtask" [ref=f1e114]
+                  - button "Delete" [ref=f1e116]
+              - listitem [ref=f1e118]:
+                - button "Tandai selesai" [ref=f1e119]
+                - paragraph [ref=f1e122]: Design
+                - generic [ref=f1e123]:
+                  - combobox "Move to list" [ref=f1e124]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e125]
+                  - button "Start focus" [ref=f1e127]
+                  - button "Add subtask" [ref=f1e129]
+                  - button "Delete" [ref=f1e131]
+              - listitem [ref=f1e133]:
+                - button "Tandai selesai" [ref=f1e134]
+                - paragraph [ref=f1e137]: Bug Fix
+                - generic [ref=f1e138]:
+                  - combobox "Move to list" [ref=f1e139]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e140]
+                  - button "Start focus" [ref=f1e142]
+                  - button "Add subtask" [ref=f1e144]
+                  - button "Delete" [ref=f1e146]
+              - listitem [ref=f1e148]:
+                - button "Tandai selesai" [ref=f1e149]
+                - paragraph [ref=f1e152]: Writing
+                - generic [ref=f1e153]:
+                  - combobox "Move to list" [ref=f1e154]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e155]
+                  - button "Start focus" [ref=f1e157]
+                  - button "Add subtask" [ref=f1e159]
+                  - button "Delete" [ref=f1e161]
+              - listitem [ref=f1e163]:
+                - button "Tandai selesai" [ref=f1e164]
+                - paragraph [ref=f1e167]: E2E Browser Task
+                - generic [ref=f1e168]:
+                  - combobox "Move to list" [ref=f1e169]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e170]
+                  - button "Start focus" [ref=f1e172]
+                  - button "Add subtask" [ref=f1e174]
+                  - button "Delete" [ref=f1e176]
+              - listitem [ref=f1e178]:
+                - button "Tandai selesai" [ref=f1e179]
+                - paragraph [ref=f1e182]: MoveMe
+                - generic [ref=f1e183]:
+                  - combobox "Move to list" [ref=f1e184]:
+                    - option "No list" [selected]
+                    - option "TestList_1788464022"
+                    - option "MoveTestA_1788474613"
+                    - option "MoveTestB_1788474613"
+                  - button "Star" [ref=f1e185]
+                  - button "Start focus" [ref=f1e187]
+                  - button "Add subtask" [ref=f1e189]
+                  - button "Delete" [ref=f1e191]

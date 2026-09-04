@@ -1,0 +1,24 @@
+- generic [ref=f4e3]:
+  - navigation "Main navigation" [ref=f4e4]:
+    - generic [ref=f4e5]:
+      - button "Dashboard" [ref=f4e6]
+      - button "Focus" [ref=f4e9]
+      - button "Tasks" [ref=f4e13]
+      - button "History" [ref=f4e16]
+      - button "Analytics" [ref=f4e19]
+      - button "Settings" [ref=f4e22]
+  - generic [ref=f4e25]:
+    - banner [ref=f4e26]:
+      - button "◉ Flowdoro" [ref=f4e27]
+      - button "Guest" [ref=f4e29]
+    - main [ref=f4e30]:
+      - generic [ref=f4e31]:
+        - heading "Focus" [level=1] [ref=f4e32]
+        - button "Select a task (optional) ▼" [ref=f4e34]:
+          - generic [ref=f4e35]: Select a task (optional)
+          - generic [ref=f4e37]: ▼
+        - generic [ref=f4e38]:
+          - generic [ref=f4e39]: 00:00:00
+          - generic [ref=f4e40]: Focus Time
+        - button "▶ Start Focus" [ref=f4e42]
+        - generic [ref=f4e43]: Press Space to start

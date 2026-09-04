@@ -60,10 +60,24 @@
 
 :root {
   color-scheme: light dark;
+  /* Mobile-first: safe-area tokens */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  /* Fluid typography */
+  --text-display: clamp(1.75rem, 8vw, 3rem);
+  --text-hero: clamp(1.5rem, 7vw, 2.5rem);
 }
 
 * {
   border-color: var(--color-border);
+}
+
+html {
+  scrollbar-gutter: stable;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 html,
@@ -71,6 +85,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  min-height: 100dvh;
 }
 
 body {
@@ -78,6 +93,37 @@ body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: contain;
+}
+
+/* Safe-area helpers */
+.safe-pb {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.safe-pt {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+
+/* Mobile-first tap target: ensure interactive elements meet 44px */
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better mobile scrollbars */
+* {
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
 }
 
 /* Skeleton pulse animation */
@@ -88,6 +134,35 @@ body {
   100% {
     background-position: 200% 0;
   }
+}
+
+/* Checkbox checkmark pop-in (scale + draw) */
+@keyframes pop-check {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-30deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.check-pop {
+  animation: pop-check 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center;
+}
+
+/* Checkbox box fill transition */
+.task-check {
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+}
+.task-check:active {
+  transform: scale(0.88);
 }
 
 .skeleton {
@@ -132,6 +207,35 @@ p {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Mobile-first utilities */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+.snap-start {
+  scroll-snap-align: start;
+}
+/* Thumb zone: bottom safe + nav height */
+.pb-safe-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .pb-safe-nav {
+    padding-bottom: 1.5rem;
+  }
+}
+/* Fluid container padding */
+.container-mobile {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
 @media (prefers-reduced-motion: reduce) {

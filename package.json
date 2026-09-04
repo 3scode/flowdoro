@@ -7,22 +7,32 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "bun run --filter '*/web' dev & bun run --filter '*/api' dev",
+    "dev": "bun run --filter '*/web' dev & bun run --cwd apps/api-cloudflare dev",
     "dev:web": "bun run --cwd apps/web dev",
-    "dev:api": "bun run --cwd apps/api dev",
+    "dev:api": "bun run --cwd apps/api-cloudflare dev",
     "dev:api:cf": "bun run --cwd apps/api-cloudflare dev",
-    "build": "bun run --filter '*/web' build && bun run --filter '*/api' build",
-    "lint": "bun run --filter '*/web' lint && bun run --filter '*/api' lint",
-    "typecheck": "bun run --filter '*/web' typecheck && bun run --filter '*/api' typecheck && bun run --cwd apps/api-cloudflare typecheck",
+    "build": "bun run --filter '*/web' build",
+    "lint": "bun run --filter '*/web' lint",
+    "typecheck": "bun run --filter '*/web' typecheck && bun run --cwd apps/api-cloudflare typecheck",
+    "seed:dev": "bun run scripts/seed.mjs",
+    "seed:better-auth": "bun run scripts/seed-better-auth.mjs",
+    "migrate:better-auth": "bun run scripts/migrate-appwrite-to-better-auth.mjs",
+    "migrate:auth": "curl -X POST http://localhost:8787/api/auth/migrate -H 'x-migrate-secret: $BETTER_AUTH_SECRET' | bun -e 'console.log(await Bun.stdin.text())'",
+    "d1:create": "bunx --cwd apps/api-cloudflare wrangler d1 create flowdoro-auth",
+    "d1:migrate": "curl -X POST http://localhost:8787/api/auth/migrate",
+    "d1:migrate:remote": "curl -X POST https://api.flowdoro.3scode.my.id/api/auth/migrate -H 'x-migrate-secret: $BETTER_AUTH_SECRET'",
     "deploy:cf": "bash deploy-cf.sh",
     "deploy:web": "bash deploy-web.sh"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/bcryptjs": "2.4.6",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "bun-types": "^1.4.0",
+    "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
+    "node-appwrite": "^29.0.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   }

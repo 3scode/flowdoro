@@ -1,0 +1,26 @@
+- generic [ref=f2e233]:
+  - navigation [ref=f2e234]:
+    - generic [ref=f2e235]: ◉ Flowdoro
+    - generic [ref=f2e236]:
+      - button "Log In" [ref=f2e237]
+      - button "Sign Up" [ref=f2e238]
+  - generic [ref=f2e239]:
+    - heading "Work until your focus fades, rest in proportion." [level=1] [ref=f2e240]: Work until your focus fades,rest in proportion.
+    - paragraph [ref=f2e241]: Stop fighting the clock. Start flowing with it. Count up from zero — never get interrupted by a rigid countdown.
+    - generic [ref=f2e242]:
+      - generic [ref=f2e243]: 01:23:45
+      - generic [ref=f2e244]: "Earned Rest: 16m"
+    - button "Get Started — Free" [ref=f2e245]
+  - generic [ref=f2e246]:
+    - generic [ref=f2e247]:
+      - text: "01"
+      - heading "Start" [level=3] [ref=f2e248]
+      - paragraph [ref=f2e249]: Tap Start — timer counts up from zero
+    - generic [ref=f2e250]:
+      - text: "02"
+      - heading "Focus" [level=3] [ref=f2e251]
+      - paragraph [ref=f2e252]: Work freely, no countdown pressure
+    - generic [ref=f2e253]:
+      - text: "03"
+      - heading "Rest" [level=3] [ref=f2e254]
+      - paragraph [ref=f2e255]: Break auto-calculated at 5:1 ratio

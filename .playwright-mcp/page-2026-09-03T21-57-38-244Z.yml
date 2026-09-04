@@ -1,0 +1,43 @@
+- generic [ref=e39]:
+  - navigation "Main navigation" [ref=e40]:
+    - generic [ref=e41]: Flowdoro
+    - button "Dashboard" [ref=e43]
+    - button "Focus" [ref=e45]
+    - button "Tasks" [active] [ref=e47]
+    - button "History" [ref=e49]
+    - button "Analytics" [ref=e51]
+    - button "Settings" [ref=e53]
+  - generic [ref=e55]:
+    - banner [ref=e56]:
+      - generic [ref=e57]: ◉ Flowdoro
+      - generic [ref=e58]:
+        - button "Demo User" [ref=e59]
+        - button "Logout" [ref=e60]
+    - main [ref=e61]:
+      - generic [ref=e155]:
+        - generic [ref=e156]:
+          - generic [ref=e157]:
+            - heading "Tasks" [level=1] [ref=e159]
+            - generic [ref=e160]: 0 pending
+            - generic [ref=e161]: ⭐ 1
+          - button "New Task" [ref=e162]
+        - generic [ref=e164]:
+          - complementary [ref=e165]:
+            - button "All Tasks" [ref=e166]
+            - button "⭐ Starred" [ref=e167]
+            - button "Today's Focus" [ref=e168]
+            - button "Scheduled" [ref=e169]
+            - button "Completed" [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]: Lists
+              - button [ref=e173]
+            - generic [ref=e175] [cursor=pointer]:
+              - generic [ref=e177]: TestList_1788464022
+              - button [ref=e178]
+          - main [ref=e180]:
+            - generic [ref=e181]:
+              - textbox "Quick add task…" [ref=e182]
+              - combobox "Assign to list" [ref=e183]:
+                - option "No list"
+                - option "TestList_1788464022"
+              - button "Add" [disabled] [ref=e184]

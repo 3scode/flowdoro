@@ -3,13 +3,12 @@ dist/
 build/
 .env
 .env.local
-.env.render
-.env.render.*
-.env.hf
-.env.hf.*
 .env.production
 .env.web.production
 *.log
 .DS_Store
 .tmp/
 .dev.vars
+.wrangler/
+apps/*/.wrangler/
+apps/web/dist/

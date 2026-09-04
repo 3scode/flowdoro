@@ -1,14 +1,16 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? ''
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
 
-function getToken(): string {
+// Better Auth uses httpOnly cookies (100% free D1) — no localStorage token needed.
+// Legacy Appwrite Bearer fallback kept for migration period (read if present, but not written).
+function getLegacyToken(): string {
   try { return localStorage.getItem('flowdoro_token') ?? '' } catch { return '' }
 }
 
 async function req(path: string, opts: RequestInit = {}) {
-  const token = getToken()
+  const legacy = getLegacyToken()
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(opts.headers ?? {}) },
+    headers: { 'Content-Type': 'application/json', ...(legacy ? { Authorization: `Bearer ${legacy}` } : {}), ...(opts.headers ?? {}) },
     ...opts,
   })
   const json = await res.json().catch(() => null)
@@ -22,11 +24,12 @@ export const api = {
   patch: (p: string, body?: unknown) => req(p, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
   del: (p: string) => req(p, { method: 'DELETE' }),
   tasks: {
-    list: (filter?: { status?: string; parentId?: string; listId?: string }) => {
+    list: (filter?: { status?: string; parentId?: string; listId?: string; starred?: boolean }) => {
       const params = new URLSearchParams()
       if (filter?.status) params.set('status', filter.status)
       if (filter?.parentId) params.set('parentId', filter.parentId)
       if (filter?.listId) params.set('listId', filter.listId)
+      if (filter?.starred) params.set('starred', 'true')
       const qs = params.toString()
       return req(`/api/tasks${qs ? '?' + qs : ''}`)
     },

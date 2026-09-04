@@ -2,7 +2,7 @@
 
 Panduan step-by-step untuk menjalankan di local, mengetes, dan memastikan build siap deploy. Semua perintah **wajib pakai `bun`** (jangan `npm`/`node`).
 
-> Stack: Svelte 5 + Vite 6 + Tailwind 4 (web) + Bun + Elysia 1.4 (api) + **Hono 4 + Appwrite Web SDK** (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage) + Docker + Hugging Face Spaces. Sejak T-APPW, tidak ada lagi PostgreSQL/Drizzle/JWT/R2. Collection: `profiles`, `tasks`, `sessions`, `session_events`, `lists`, `google_tokens` + bucket `avatars`.
+> Stack: Svelte 5 + Vite 6 + Tailwind 4 (web) + **Hono 4 + Appwrite Web SDK** (Cloudflare Workers API) + Appwrite Cloud (Auth + DB + Storage). Collection: `profiles`, `tasks`, `sessions`, `session_events`, `lists` + bucket `avatars`. Tidak ada Docker/HF lagi — full Cloudflare.
 
 ---
 
@@ -15,13 +15,12 @@ npx wrangler --version  # untuk CF Workers deployment
 ```
 
 Port yang dipakai:
-- `3000` → API (Elysia/HF Spaces)
-- `5173` → Web (Vite)
 - `8787` → API Cloudflare Workers local dev (wrangler)
+- `5173` → Web (Vite)
 
 Pastikan port kosong:
 ```bash
-lsof -i :3000 -i :5173 -i :8787 2>/dev/null || ss -tulpn | grep -E '3000|5173|8787'
+lsof -i :5173 -i :8787 2>/dev/null || ss -tulpn | grep -E '5173|8787'
 ```
 
 ---
@@ -35,68 +34,48 @@ cd flowdoro
 # 2.1 Install dependencies — dari root (workspaces ke-hoist ke root node_modules)
 bun install
 
-# 2.2 Buat file env — satu file di root
+# 2.2 Buat file env — satu file di root + .dev.vars untuk wrangler
 cp .env.example .env
+cp .env .dev.vars
 # Isi APPWRITE_PROJECT_ID + APPWRITE_API_KEY (lihat env.md §2)
 ```
 
-> `apps/api/src/config/env.ts` membaca `.env` via `dotenv/config` untuk HF Spaces.
-> `apps/api-cloudflare/src/lib/env.ts` membaca `process.env` langsung — Workers inject vars sendiri.
+> `apps/api-cloudflare/src/lib/env.ts` membaca `c.env` (Workers vars). Local `wrangler dev` baca `.dev.vars`.
 
 ---
 
 ## 3. Siapkan Appwrite Cloud (sekali)
 
 1. Konsol → https://cloud.appwrite.io → buat project (region **Singapore**).
-2. Buat database `flowdoro` + 6 collections (`profiles`, `tasks`, `sessions`, `session_events`, `lists`, `google_tokens`) + index — detail atribut di `env.md` §2.
+2. Buat database `flowdoro` + 5 collections (`profiles`, `tasks`, `sessions`, `session_events`, `lists`) + index — detail atribut di `env.md` §2.
 3. Buat bucket `avatars` (Storage).
 4. Buat API key (scope users/databases/storage/account read+write) → isi `APPWRITE_API_KEY`.
-5. Isi `.env` dengan nilai tersebut.
+5. Isi `.env` + `.dev.vars` dengan nilai tersebut.
 
 **Seed demo** (user `demo@flowdoro.app` / `password123` + 5 tasks + 15 sessions):
 ```bash
-bun run --cwd apps/api seed:dev
+bun run seed:dev   # scripts/seed.mjs
 ```
 
 ---
 
 ## 4. Jalankan di Local
 
-### 4.1 Elysia API (HF Spaces) + Web
-
-```bash
-# API di :3000
-bun run dev:api
-
-# Web di :5173 (proxy /api → API_URL)
-bun run dev:web
-```
-
-Verifikasi cepat:
-```bash
-curl http://localhost:3000/api/health
-# → {"success":true,"data":{"status":"ok","service":"flowdoro-api",...}}
-```
-
-### 4.2 Cloudflare Workers API + Web
-
 ```bash
 # API di :8787 (wrangler)
-bun run dev:api:cf
+bun run dev:api
 
 # Web di :5173 (proxy /api → http://localhost:8787)
-API_URL=http://localhost:8787 bun run dev:web
-```
+bun run dev:web
 
-> Env `APPWRITE_*` sudah di-set di `wrangler.toml` → akan terbaca otomatis saat `wrangler dev`. Untuk override lokal, buat `.dev.vars`:
-> ```bash
-> cp .env.example .dev.vars
-> # edit APPWRITE_* sesuai project kamu
-> ```
+# atau keduanya:
+bun run dev
+```
 
 Verifikasi:
 ```bash
 curl http://localhost:8787/api/health
+# → {"success":true,"data":{"status":"ok","service":"flowdoro-api",...}}
 ```
 
 ---
@@ -104,38 +83,32 @@ curl http://localhost:8787/api/health
 ## 5. Verifikasi Build (WAJIB lolos sebelum handoff)
 
 ```bash
-# Typecheck semua — API lama + Workers baru
+# Typecheck
 bun run typecheck
-
-# Build API bundle (Elysia/HF)
-bun run --cwd apps/api build
 
 # Build Workers bundle (dry-run, validasi wrangler)
 bun run --cwd apps/api-cloudflare deploy --dry-run
 
 # Build Web — wajib lolos (menangkap error alias $lib + Tailwind)
 bun run --cwd apps/web build
-
-# Docker build API (context apps/api)
-docker build -f apps/api/Dockerfile apps/api -t flowdoro-api
 ```
 
 ---
 
 ## 6. Deploy
 
-### 6.1 Cloudflare Workers (Recommended)
-
-Deploy API ke Cloudflare Workers — serverless, no CC, global CDN.
+### Cloudflare Workers
 
 ```bash
 # 1. Login (sekali)
 bunx wrangler login
 
-# 2. Deploy
+# 2. Set secret (sekali, jangan commit)
+bunx wrangler --cwd apps/api-cloudflare secret put APPWRITE_API_KEY
+
+# 3. Deploy
 bun run deploy:cf
 # atau: bash deploy-cf.sh
-# atau manual: bun run --cwd apps/api-cloudflare deploy
 ```
 
 Setelah deploy, API tersedia di:
@@ -156,10 +129,9 @@ Workers & Pages → flowdoro-api → Settings → Variables → Add:
 | `APPWRITE_COLLECTION_SESSIONS` | `sessions` |
 | `APPWRITE_COLLECTION_EVENTS` | `session_events` |
 | `APPWRITE_COLLECTION_LISTS` | `lists` |
-| `APPWRITE_COLLECTION_GOOGLE_TOKENS` | `google_tokens` |
 | `APPWRITE_BUCKET_AVATARS` | `avatars` |
-| `CORS_ORIGIN` | `https://<web-url>` |
-| `FRONTEND_URL` | `https://<web-url>` |
+| `CORS_ORIGIN` | `https://flowdoro-web.pages.dev` |
+| `FRONTEND_URL` | `https://flowdoro-web.pages.dev` |
 | `NODE_ENV` | `production` |
 
 **Secret** (tidak terlihat publik):
@@ -167,62 +139,19 @@ Workers & Pages → flowdoro-api → Settings → Variables → Add:
 |---|---|
 | `APPWRITE_API_KEY` | Server API key (role users/databases/storage/account) |
 
-### 6.2 Hugging Face Spaces (Fallback — Docker)
+### Cloudflare Pages (Web)
 
-Flowdoro deploy ke HF Spaces gratis tanpa kartu kredit. **API** = Space Docker (port wajib **7860**), **DB/Auth/Storage** = Appwrite Cloud (no CC), **Web** = Space Static **atau** Cloudflare Pages / Netlify / Vercel (semuanya no CC).
+```bash
+bash deploy-web.sh
+# → build dengan VITE_API_URL=https://flowdoro-api...workers.dev lalu wrangler pages deploy
+```
 
-#### 6.2.1 Space `flowdoro-api` (Docker)
-
-1. hugginface.co → **New Space**:
-   - Owner / Space name: `flowdoro-api`
-   - License: MIT
-    - **Docker** (bukan Gradio) → `apps/api/Dockerfile` (sudah `EXPOSE 7860`)
- 2. Push repo → HF build Space dari `apps/api/Dockerfile`.
-3. Set **Settings → Variables and secrets**:
-
-   **Variables** (terlihat publik — jangan taruh rahasia):
-   | Variable | Nilai |
-   |---|---|
-   | `PORT` | `7860` |
-   | `NODE_ENV` | `production` |
-   | `APPWRITE_ENDPOINT` | `https://cloud.appwrite.io/v1` |
-   | `APPWRITE_PROJECT_ID` | `<project-id>` |
-   | `APPWRITE_DATABASE_ID` | `flowdoro` |
-   | `APPWRITE_COLLECTION_PROFILES` | `profiles` |
-   | `APPWRITE_COLLECTION_TASKS` | `tasks` |
-   | `APPWRITE_COLLECTION_SESSIONS` | `sessions` |
-   | `APPWRITE_COLLECTION_EVENTS` | `session_events` |
-   | `APPWRITE_COLLECTION_LISTS` | `lists` |
-   | `APPWRITE_COLLECTION_GOOGLE_TOKENS` | `google_tokens` |
-   | `APPWRITE_BUCKET_AVATARS` | `avatars` |
-   | `CORS_ORIGIN` | `https://<username>-flowdoro-web.hf.space` (atau URL web) |
-   | `APP_URL` | URL web |
-   | `API_URL` | `https://<username>-flowdoro-api.hf.space` |
-   | `FRONTEND_URL` | URL web |
-   | `REST_RATIO_DEFAULT` | `5` |
-   | `LOG_LEVEL` | `info` |
-
-   **Secret** (wajib, tidak terlihat publik):
-   | Secret | Nilai |
-   |---|---|
-   | `APPWRITE_API_KEY` | Server API key dari Console (role users/databases/storage/account) |
-
- 4. **Factory reboot** setelah set env.
-
- > Alur cepat via script: `bash deploy-hf.sh` (panduan langkah-langkah manual + env yang perlu di-set). Script lain tersedia: `deploy-cf.sh` (API → Workers) dan `deploy-web.sh` (Web → CF Pages).
-
- > Catatan: HF Spaces *pause* setelah 48h tanpa aktivitas; Appwrite Cloud juga pause setelah ~1 minggu idle. Untuk keep warm, set cron terjadwal `GET /api/health` (mis. GitHub Actions / UptimeRobot) setiap beberapa jam.
-
-#### 6.2.2 Seed data di production (opsional)
+### Seed data di production (opsional)
 
 ```bash
 # dari lokal, pakai APPWRITE_* yang menunjuk ke project production
-bun run --cwd apps/api seed:dev
+bun run seed:dev
 ```
-
-#### 6.2.3 Space Web / Static
-
-Build `apps/web/dist` dengan `VITE_API_URL=https://<username>-flowdoro-api.hf.space`, lalu deploy sebagai HF **Static Space** atau Cloudflare Pages / Netlify / Vercel.
 
 ---
 
@@ -230,32 +159,23 @@ Build `apps/web/dist` dengan `VITE_API_URL=https://<username>-flowdoro-api.hf.sp
 
 | Gejala | Penyebab | Solusi |
 |---|---|---|
-| Container crash `APPWRITE_PROJECT_ID missing` | `APPWRITE_PROJECT_ID` belum di-set | Set di Space Variables → Factory reboot |
-| API log `AppwriteException ... 401 Unauthorized` saat akses DB | `APPWRITE_API_KEY` salah/expired / scope kurang | Cek API key di Console, pastikan scope users/databases/storage/account read+write |
-| Web `401` terus / `CORS error` | `CORS_ORIGIN` tidak exact match URL Web | Set `CORS_ORIGIN` = URL web persis → Factory reboot |
-| Login sukses tapi refresh jadi logout | Cookie `token` (session secret) tidak terkirim | Pastikan `NODE_ENV=production` (cookie `secure`) + `CORS_ORIGIN` benar + no 3rd-party cookie block |
-| `/api/health` ok tapi `/api/me` 401 | Session expired (7d) / cookie hilang | Login ulang |
-| File avatar 4xx | Bucket `avatars` belum dibuat / file ekstensi tidak diizinkan | Buat bucket + set `jpg,jpeg,png,webp` |
-| Sleep/cold start lambat (10-30s) | HF + Appwrite pause idle | Cron keep-warm `GET /api/health` |
-| Wrangler deploy gagal `missing APPWRITE_API_KEY` | Secret belum di-set di Dashboard | Workers → flowdoro-api → Settings → Bindings → Add Secret |
-| `setDevKey not a function` saat local dev | SDK appwrite v26 berubah API | Pastikan appwrite@^26.2.0 terinstall di `apps/api-cloudflare/node_modules` |
+| `401` terus / `CORS error` | `CORS_ORIGIN` tidak exact match URL Web | Set `CORS_ORIGIN` = `https://flowdoro-web.pages.dev` exact |
+| Login sukses tapi refresh jadi logout | Cookie `token` tidak terkirim | Pastikan `CORS_ORIGIN` benar + no 3rd-party cookie block |
+| `/api/health` ok tapi `/api/me` 401 | Session expired / secret salah | Login ulang, cek `APPWRITE_API_KEY` secret |
+| File avatar 4xx | Bucket `avatars` belum dibuat | Buat bucket + set `jpg,jpeg,png,webp` |
+| Wrangler deploy gagal `missing APPWRITE_API_KEY` | Secret belum di-set | `wrangler secret put APPWRITE_API_KEY` |
+| `APPWRITE_DATABASE_ID` not found | Typo di `.dev.vars`/`wrangler.toml` | Cek `6a97dd7e002e7e71c54c` (harus `e7e71`) |
 
 ---
 
-## 8. Checklist Handoff (diminta user)
+## 8. Checklist Handoff
 
-- [ ] `bun run typecheck` → EXIT 0 (termasuk api-cloudflare)
-- [ ] `bun run --cwd apps/api build` → sukses (bundle `dist/index.js`)
+- [ ] `bun run typecheck` → EXIT 0
 - [ ] `bun run --cwd apps/api-cloudflare deploy --dry-run` → sukses (validasi wrangler)
 - [ ] `bun run --cwd apps/web build` → sukses
-- [ ] `docker build -f apps/api/Dockerfile apps/api` → sukses
-- [ ] `curl http://localhost:3000/api/health` (Elysia) → `{success:true,...}`
-- [ ] `curl http://localhost:8787/api/health` (CF Workers local) → `{success:true,...}`
-- [ ] E2E `curl`: register → login → `GET /api/me` → create task → create session → patch completed → analytics summary
- - [ ] `.env.hf.api` sudah berisi `APPWRITE_*`; `APPWRITE_API_KEY` = **Secret** di Space (lihat juga `.env.hf`, `.env.hf.web`)
+- [ ] `curl http://localhost:8787/api/health` → `{success:true,...}`
+- [ ] E2E `curl`: register → login → `GET /api/me` → create task → create list → analytics
 - [ ] Workers dashboard: `APPWRITE_API_KEY` = **Secret**, `CORS_ORIGIN` + `APPWRITE_*` = **Variables**
-
- > Env HF diringkas di **Space → Settings → Variables and secrets**. Variabel **wajib Secret**: `APPWRITE_API_KEY`. File `render.yaml.deprecated` disimpan untuk referensi migrasi balik ke Render jika butuh. Fly config (`fly.toml`, `deploy-fly.sh`) sudah dihapus — migrasi penuh ke Cloudflare Workers.
 
 ## Ringkasan Script Deploy
 
@@ -263,4 +183,4 @@ Build `apps/web/dist` dengan `VITE_API_URL=https://<username>-flowdoro-api.hf.sp
 |---|---|
 | `bun run deploy:cf` / `bash deploy-cf.sh` | API → Cloudflare Workers |
 | `bash deploy-web.sh` | Web → CF Pages (build dengan URL hardcoded Workers API) |
-| `bash deploy-hf.sh` | Panduan HF Spaces Docker setup |
+| `bun run seed:dev` | Seed Appwrite Cloud (`scripts/seed.mjs`) |

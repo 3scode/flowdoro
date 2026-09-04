@@ -63,22 +63,44 @@ Buka Appwrite Console → Database `flowdoro` → Collection `tasks` → Attribu
 
 ---
 
-## 2. Google Cloud Console — Buat OAuth Client ID (Gratis)
+## 2. Google Cloud Console — Buat OAuth Client ID (Gratis) — FIX redirect_uri_mismatch
 
-1. Buka https://console.cloud.google.com
-2. Buat project baru (gratis, **tanpa kartu kredit**)
-3. **APIs & Services → Library** → cari dan aktifkan **Google Calendar API**
-4. **APIs & Services → OAuth consent screen**
+> **Error 400 redirect_uri_mismatch / Akses diblokir: Permintaan tidak valid** = `redirect_uri` di code tidak ada di Console. Flowdoro pakai **1 Client ID untuk 2 flow** (Better Auth login + Calendar) → butuh **9 redirect URIs**.
+
+1. Buka https://console.cloud.google.com → pilih project `YOUR_GOOGLE_PROJECT_ID` (`152902907428-q1ema…` contoh)
+2. **APIs & Services → Library** → cari dan aktifkan **Google Calendar API** + **Google People API** → Enable
+3. **APIs & Services → OAuth consent screen**
    - User type: **External**
-   - Isi nama app = `Flowdoro`, email contact kamu
-   - Add scope: `.../auth/calendar.events`
-   - Add test user = email kamu (bisa tambah nanti)
-   - Save & continue sampai selesai
-5. **APIs & Services → Credentials → Create Credentials → OAuth client ID**
-   - Application type: **Web application**
-   - Name: `Flowdoro (local)`
-   - Authorized redirect URIs: `http://localhost:3000/api/google/callback`
-   - Klik **Create** → copy **Client ID** dan **Client Secret**
+   - App name = `Flowdoro`, Support email = `email.trisno.sanjaya@gmail.com`
+   - Application home page = `https://flowdoro.3scode.my.id`, Authorized domains = `3scode.my.id` (tambah `flowdoro.3scode.my.id` & `api.flowdoro.3scode.my.id`)
+   - Scopes → Add or Remove Scopes → centang `email`, `profile`, `openid` + ketik `https://www.googleapis.com/auth/calendar.events` → Save
+   - Test users → Add users → tambah email kamu yang kena blokir (dan `demo@flowdoro.app`) → Save (atau Publish ke In Production)
+   - Save & continue sampai selesai, tunggu 5 menit
+4. **APIs & Services → Credentials → OAuth 2.0 Client IDs → klik `152902907428-q1ema…`**
+   - Application type: **Web application**, Name: `Flowdoro`
+   - **Authorized JavaScript origins** (8, tanpa `/`):
+     ```
+     https://flowdoro.3scode.my.id
+     https://api.flowdoro.3scode.my.id
+     https://flowdoro-web.pages.dev
+     https://96f159ba.flowdoro-web.pages.dev
+     https://flowdoro.email-trisno-sanjaya.pages.dev
+     https://flowdoro-api.email-trisno-sanjaya.workers.dev
+     http://localhost:5173
+     http://localhost:8787
+     ```
+   - **Authorized redirect URIs** (9, exact tanpa `/`):
+     ```
+     http://localhost:8787/api/auth/callback/google
+     http://localhost:8787/api/auth/callback/github
+     http://localhost:8787/api/google/callback
+     https://api.flowdoro.3scode.my.id/api/auth/callback/google
+     https://api.flowdoro.3scode.my.id/api/auth/callback/github
+     https://api.flowdoro.3scode.my.id/api/google/callback
+     https://flowdoro-api.email-trisno-sanjaya.workers.dev/api/auth/callback/google
+     https://flowdoro-api.email-trisno-sanjaya.workers.dev/api/google/callback
+     ```
+   - Save → tunggu 5 menit
 
 ---
 
@@ -87,9 +109,10 @@ Buka Appwrite Console → Database `flowdoro` → Collection `tasks` → Attribu
 ```bash
 cd /home/3scode/code/flowdoro
 cp .env.example .env
+cp .env .dev.vars   # wrangler dev baca .dev.vars
 ```
 
-Edit `.env` dan isi nilai asli:
+Edit `.env` + `.dev.vars` dan isi nilai asli:
 
 ```bash
 # Appwrite — isi dari console.appwrite.io
@@ -97,10 +120,13 @@ APPWRITE_PROJECT_ID=<project-id>
 APPWRITE_API_KEY=<api-key-server>
 APPWRITE_DATABASE_ID=flowdoro
 
-# Google — hasil dari Langkah 2
+# Google — hasil dari Langkah 2 (1 Client ID dipakai 2 flow)
 GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCXXX-xxxxxxxxxxxx
-GOOGLE_REDIRECT_URI=http://localhost:3000/api/google/callback
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GOOGLE_REDIRECT_URI=http://localhost:8787/api/google/callback  # lokal, prod https://api.flowdoro.3scode.my.id/api/google/callback (calendar)
+# Better Auth social login pakai BETTER_AUTH_URL + /api/auth/callback/google (auto) — jangan tukar dengan GOOGLE_REDIRECT_URI
+BETTER_AUTH_URL=http://localhost:8787  # prod https://api.flowdoro.3scode.my.id
+BETTER_AUTH_SECRET=<64-hex openssl rand -hex 32>
 
 # Generate random 32-byte hex key untuk enkripsi token
 # Jalankan perintah ini di terminal:
@@ -124,7 +150,7 @@ bun run --cwd apps/api seed:dev
 Terminal 1 — Backend:
 ```bash
 bun run dev:api
-# → http://localhost:3000
+# → http://localhost:8787 (wrangler)
 ```
 
 Terminal 2 — Frontend:
@@ -162,7 +188,7 @@ bun run dev:web
 | Masalah | Solusi |
 |---|---|
 | `UNAUTHORIZED` saat akses `/api/tasks` | Pastikan cookie/session Appwrite valid, cek `.env` |
-| OAuth gagal di callback | Verifikasi redirect URI sama persis: `http://localhost:3000/api/google/callback` |
+| OAuth gagal / `redirect_uri_mismatch` / `Akses diblokir: Permintaan tidak valid` | Verifikasi **9 redirect URIs** di Console sama persis (tanpa `/`, `http://localhost:8787` vs `https://api.flowdoro.3scode.my.id`), Authorized JS origins 8, Test users berisi email pemakai, Scopes `email,profile,openid,calendar.events` |
 | `GOOGLE_TOKEN_ENCRYPTION_KEY` default warning | Ganti dengan key random sebelum production |
 | Task tidak muncul di Calendar | Cek console browser — pastikan sudah connected + ada dueDate |
 | Build error di typecheck | Build tetap OK. Beberapa error pre-existing di Focus/InputField (bukan dari fitur baru) |

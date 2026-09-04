@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { ID } from 'appwrite'
-import { dbUpdate, getProfile } from '../lib/appwrite'
+import { dbUpdate, dbList, dbDelete, getProfile } from '../lib/appwrite'
 import { authMiddleware } from '../middleware/auth'
 
 type User = { id: string; email: string; name: string }
@@ -18,13 +18,72 @@ function serialize(doc: any) {
 
 async function ensureProfile(e: any, user: User) {
   let profile = await getProfile(e, user.id)
-  if (!profile) {
-    profile = await fetch(`${e.appwriteEndpoint}/databases/${e.appwriteDatabaseId}/collections/${e.appwriteCollectionProfiles}/documents`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-appwrite-project': e.appwriteProjectId, 'x-appwrite-key': e.appwriteApiKey },
-      body: JSON.stringify({ documentId: ID.unique(), data: { userId: user.id, email: user.email, name: user.name, restRatio: 5, theme: 'system', notificationsEnabled: false, soundEnabled: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } }),
-    }).then(r => r.json())
+  if (profile) return profile
+
+  // Fallback: check by email (lowercased) — handles D1 migration where old Appwrite profile has different userId
+  const emailLower = (user.email ?? '').toLowerCase()
+  if (emailLower) {
+    try {
+      let byEmail = await dbList(e, e.appwriteCollectionProfiles, [['email', emailLower]])
+      console.log(`[profiles] byEmail ${emailLower} found ${byEmail.documents?.length ?? 0}`)
+      // Fallback for eventual consistency / query quirks: client-side filter if 0
+      if (!byEmail.documents?.length) {
+        try {
+          const all = await dbList(e, e.appwriteCollectionProfiles, [], 100, 0)
+          console.log(`[profiles] byEmail fallback all ${all.documents?.length ?? 0}`)
+          const filtered = (all.documents || []).filter((d: any) => (d.email ?? '').toLowerCase() === emailLower)
+          console.log(`[profiles] byEmail fallback filtered ${filtered.length}`)
+          if (filtered.length) byEmail = { documents: filtered, total: filtered.length } as any
+        } catch (e:any) { console.log('[profiles] fallback error', e?.message) }
+      }
+      if (byEmail.documents?.length) {
+        // Pick most recent profile for this email
+        const sorted = [...byEmail.documents].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        const primary = sorted[0]
+        const oldUserIds = [...new Set(sorted.map((d) => d.userId).filter((id: string) => id !== user.id))]
+        if (oldUserIds.length) {
+          console.log(`[profiles] reconciling ${emailLower}: ${oldUserIds.join(',')} -> ${user.id}`)
+          // Update primary profile to new D1 id
+          try { await dbUpdate(e, e.appwriteCollectionProfiles, primary.$id, { userId: user.id, updatedAt: new Date().toISOString() }) } catch {}
+          // Migrate related collections from old ids to new
+          const colls = [e.appwriteCollectionTasks, e.appwriteCollectionLists, e.appwriteCollectionSessions, e.appwriteCollectionGoogleTokens]
+          for (const oldId of oldUserIds) {
+            for (const coll of colls) {
+              try {
+                let offset = 0
+                while (true) {
+                  const res: any = await dbList(e, coll, [['userId', oldId]], 100, offset).catch(() => ({ documents: [] }))
+                  if (!res.documents?.length) break
+                  for (const doc of res.documents) {
+                    try { await dbUpdate(e, coll, doc.$id, { userId: user.id }) } catch {}
+                  }
+                  if (res.documents.length < 100) break
+                  offset += res.documents.length
+                }
+              } catch {}
+            }
+          }
+          // Delete duplicate profiles (keep primary)
+          for (let i = 1; i < sorted.length; i++) {
+            try { await dbDelete(e, e.appwriteCollectionProfiles, sorted[i].$id) } catch {}
+          }
+          // Return the reconciled primary (now with new userId)
+          const updated = await getProfile(e, user.id)
+          if (updated) return updated
+          return { ...primary, userId: user.id }
+        }
+        // No old ids (should not happen), but return primary if it already matches
+        if (primary.userId === user.id) return primary
+      }
+    } catch {}
   }
+
+  // No existing by userId or email — create new
+  profile = await fetch(`${e.appwriteEndpoint}/databases/${e.appwriteDatabaseId}/collections/${e.appwriteCollectionProfiles}/documents`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-appwrite-project': e.appwriteProjectId, 'x-appwrite-key': e.appwriteApiKey },
+    body: JSON.stringify({ documentId: ID.unique(), data: { userId: user.id, email: user.email, name: user.name, restRatio: 5, theme: 'system', notificationsEnabled: false, soundEnabled: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } }),
+  }).then(r => r.json())
   return profile
 }
 

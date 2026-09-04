@@ -57,9 +57,9 @@
       aria-invalid={error ? 'true' : undefined}
       aria-describedby={error ? `${name}-error` : undefined}
       class={[
-        'w-full h-11 rounded-md border bg-surface text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors',
+        'w-full min-h-11 h-11 rounded-md border bg-surface text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors text-base md:text-sm',
         icon ? 'pl-10' : 'pl-3.5',
-        'pr-3.5',
+        type === 'password' ? 'pr-10' : 'pr-3.5',
         error ? 'border-error' : success ? 'border-success' : 'border-border',
         'focus:border-primary focus:ring-2 focus:ring-primary/30',
         disabled && 'opacity-50 cursor-not-allowed',
@@ -69,7 +69,7 @@
     {#if type === 'password'}
       <button
         type="button"
-        class="absolute right-3 text-text-secondary hover:text-text-primary"
+        class="absolute right-2 w-8 h-8 flex items-center justify-center rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition"
         onclick={() => (showPassword = !showPassword)}
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >

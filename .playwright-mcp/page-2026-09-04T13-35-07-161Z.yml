@@ -1,0 +1,26 @@
+- generic [ref=f13e2]:
+  - generic [ref=f13e3]:
+    - heading "◉ Flowdoro" [level=1] [ref=f13e4]
+    - paragraph [ref=f13e5]: Welcome back
+    - generic [ref=f13e6]:
+      - generic [ref=f13e7]: Google login cancelled or failed
+      - generic [ref=f13e8]:
+        - generic [ref=f13e9]: Email
+        - textbox "Email" [ref=f13e10]:
+          - /placeholder: you@example.com
+      - generic [ref=f13e11]:
+        - generic [ref=f13e12]:
+          - generic [ref=f13e13]: Password
+          - button "Password" [ref=f13e14]: Forgot password?
+        - textbox "••••••••" [ref=f13e15]
+      - button "Log In" [ref=f13e16]
+      - generic [ref=f13e17]: or continue with
+      - generic [ref=f13e21]:
+        - button "Google" [ref=f13e22]
+        - button "GitHub" [ref=f13e24]
+      - paragraph [ref=f13e26]:
+        - text: Don't have an account?
+        - button "Sign Up" [ref=f13e27]
+  - status [ref=f13e29]:
+    - paragraph [ref=f13e32]: Google login cancelled or failed
+    - button "Dismiss" [ref=f13e33]

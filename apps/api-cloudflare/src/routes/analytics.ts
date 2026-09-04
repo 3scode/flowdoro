@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { dbList } from '../lib/appwrite'
+import { dbListAll } from '../lib/appwrite'
 import { authMiddleware } from '../middleware/auth'
 
 type User = { id: string; email: string; name: string }
@@ -16,18 +16,10 @@ function streakDays(list: { startedAt: string }[]) {
 }
 
 async function listAllCompleted(e: any, userId: string): Promise<any[]> {
-  const all: any[] = []
-  let cursor = 0
-  const limit = 100
-  while (true) {
-    const r = await dbList(e, e.appwriteCollectionSessions, [
-      ['userId', userId], ['status', 'completed'],
-    ])
-    all.push(...r.documents)
-    if (cursor + limit >= r.total) break
-    cursor += limit
-  }
-  return all
+  const r = await dbListAll(e, e.appwriteCollectionSessions, [
+    ['userId', userId], ['status', 'completed'],
+  ], 100)
+  return r.documents
 }
 
 analytics.get('/summary', async (c) => {
